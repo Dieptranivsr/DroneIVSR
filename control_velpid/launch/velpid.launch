@@ -1,4 +1,0 @@
-<launch>
-    <node name="control_velpid_node" pkg="control_velpid" type="control_velpid_node" output="screen">
-    </node>
-</launch>
