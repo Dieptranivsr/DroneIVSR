@@ -6,7 +6,7 @@ In this project has full file after installed and setup
 
 ![46384ca9aa0c56520f1d](https://user-images.githubusercontent.com/69444682/90326110-8e203380-dfae-11ea-8793-686585254def.jpg)
 
-Remove Folder on your local repository.
+### Remove Folder on your local repository.
 The steps for doing this are:
 
 * In the command-line, navigate to your local repository.
@@ -25,4 +25,9 @@ The steps for doing this are:
 * Push the change to your remote repository:
 ```
  $ git push origin master
+```
+
+### Update your local branch "master"
+```shell
+ $ git pull origin master
 ```
