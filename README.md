@@ -7,6 +7,9 @@ In this project has full file after installed and setup
 ![46384ca9aa0c56520f1d](https://user-images.githubusercontent.com/69444682/90326110-8e203380-dfae-11ea-8793-686585254def.jpg)
 
 ![image](https://user-images.githubusercontent.com/69444682/102704197-bdbbb100-42aa-11eb-84f6-1e8e7b59f865.png)
+https://www.git-tower.com/blog/media/pages/posts/git-cheat-sheet/-1223884809-1607611262/git-cheat-sheet-large01.png
+
+![image](https://user-images.githubusercontent.com/69444682/102704245-80a3ee80-42ab-11eb-87c7-108ad9aa83d5.png)
 
 ### Remove Folder on your local repository.
 The steps for doing this are:
