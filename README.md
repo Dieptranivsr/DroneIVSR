@@ -6,6 +6,8 @@ In this project has full file after installed and setup
 
 ![46384ca9aa0c56520f1d](https://user-images.githubusercontent.com/69444682/90326110-8e203380-dfae-11ea-8793-686585254def.jpg)
 
+![image](https://user-images.githubusercontent.com/69444682/102704197-bdbbb100-42aa-11eb-84f6-1e8e7b59f865.png)
+
 ### Remove Folder on your local repository.
 The steps for doing this are:
 
