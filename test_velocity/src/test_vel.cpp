@@ -170,6 +170,7 @@ int main(int argc, char **argv)
     		if( count > 1 && v[count] < 5 && v[count - 1] < v[count])
     		{
     		    ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
+    		    mode = 3;
     		    break;
     		}
     		++count;
@@ -180,10 +181,12 @@ int main(int argc, char **argv)
     	    offb_set_mode.request.custom_mode = "AUTO.LAND";
         	if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent){
         		ROS_INFO("AUTO.LAND enabled");
+        		mode = 4;
                 break;
         	}
     	}
-        
+        if (mode == 4)
+        	break;
         ros::spinOnce();
         rate.sleep();
     }
