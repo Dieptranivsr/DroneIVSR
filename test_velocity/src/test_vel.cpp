@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 			("mavros/state", 10, state_cb);
 	ros::Subscriber local_pose_pub = td.subscribe<geometry_msgs::PoseStamped>
 			("mavros/local_position/pose", 10, pose_cb);
-    ros::Subscriber batt_sub = td.subscribe<sensor_msgs::BatteryState> 
+	ros::Subscriber batt_sub = td.subscribe<sensor_msgs::BatteryState> 
             ("mavros/battery", 10, battery_cb);
 
 	// Publisher
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     while (1)
     {
     	if (count > 10)
-			ros::shutdown();
+    		ros::shutdown();
     		
     	if (strcmp(a, "y")||strcmp(a, "Y"))
     		break;
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 
     std::vector<double> v;
     std::vector<double> data_x, data_y, data_z, data_count;
-	Eigen::Vector3d cur_data;
+    Eigen::Vector3d cur_data;
     count = 0;
     double origin;
     while(ros::ok())
@@ -152,29 +152,28 @@ int main(int argc, char **argv)
 
                 //compute velocity to fly from A to B
                 vs = compute_velocity(pose_A, pose_B, _timer);
-				set_mav_frame_client.call(mav_frame_set);
-				origin = ros::Time::now().toSec();
-            	mode = 2;
+                set_mav_frame_client.call(mav_frame_set);
+                origin = ros::Time::now().toSec();
+                mode = 2;
             }
             break;
     	case 2:
     		vel_sp_pub.publish(vs);
-
     		v.push_back(distance(current_pose, pose_B));
-
+    		
     		if( count % 5 == 0)
-			{
+    		{
     			ROS_INFO("Distance between current position and point B: %f (m)", v[count]);
-				batt_percent = current_batt.percentage * 100;
-				ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
-				ROS_INFO_STREAM("Current position: \n" << current_pose.pose.position);
-				
-	        	tf::pointMsgToEigen(current_pose.pose.position, cur_data);
-	        	data_x.push_back(cur_data.x());
-	        	data_y.push_back(cur_data.y());
-	        	data_z.push_back(cur_data.z());
-	        	data_count.push_back(count);
-			}
+    			batt_percent = current_batt.percentage * 100;
+    			ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+    			ROS_INFO_STREAM("Current position: \n" << current_pose.pose.position);
+
+    			tf::pointMsgToEigen(current_pose.pose.position, cur_data);
+    			data_x.push_back(cur_data.x());
+    			data_y.push_back(cur_data.y());
+    			data_z.push_back(cur_data.z());
+    			data_count.push_back(count);
+    		}
     		//if( count > 1 && v[count] < 0.1 && v[count - 1] < v[count])
     		//{
     		    //ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
@@ -187,9 +186,10 @@ int main(int argc, char **argv)
 
     			if( v[count] < 0.1)
     				ROS_INFO("Post velocity was successfully");
-    			else{
+    			else
+    			{
     				ROS_INFO("Post velocity was unsuccessfully");
-    				}
+    			}
     		    mode = 3;
     		    break;
     		}
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
      * Export image about distance between current position and point B in flight
      */
 	std::vector<double> xs1, ys1, xs2, ys2;
-    /////////////////////////////////////////////////////-----image 1st-----
+	/////////////////////////////////////////////////////-----image 1st-----
     for (int i = 0; i < v.size(); i++)
     {
     	xs1.push_back(i);
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
     }
     std::string name1 = getName();
     captureGraph(xs1, ys1, name1);
-	/////////////////////////////////////////////////////-----image 2rd-----
+    /////////////////////////////////////////////////////-----image 2rd-----
     for (int i = v.size()-10; i < v.size(); i++)
 	{
 	    xs2.push_back(i);
@@ -230,11 +230,11 @@ int main(int argc, char **argv)
     std::string name2 = getName();
     captureGraph(xs2, ys2, name2);
     
-	//Export image path flight
+    //Export image path flight
     std::string data_xy = getName();
     captureGraph(data_x, data_y, data_xy);
     std::string data_zt = getName();
     captureGraph(data_z, data_count, data_zt);
-
-	return 0;
+    
+    return 0;
 }
