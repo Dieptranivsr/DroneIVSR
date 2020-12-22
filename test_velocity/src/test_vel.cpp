@@ -126,8 +126,6 @@ int main(int argc, char **argv)
     
     // publish target, keep drone hovering
     int mode = 1;
-    //compute velocity to fly from A to B
-    vs = compute_velocity(pose_A, pose_B, _timer);
 
     std::vector<double> v;
     count = 0;
@@ -151,6 +149,9 @@ int main(int argc, char **argv)
                 pose_B.pose.position.x = pose_A.pose.position.x + 4;
                 pose_B.pose.position.y = pose_A.pose.position.y;
                 pose_B.pose.position.z = pose_A.pose.position.z;
+
+                //compute velocity to fly from A to B
+                vs = compute_velocity(pose_A, pose_B, _timer);
             	mode = 2;
             }
             break;
