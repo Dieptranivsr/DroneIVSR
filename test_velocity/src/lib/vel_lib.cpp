@@ -59,7 +59,7 @@ bool position_distance(geometry_msgs::PoseStamped e1, geometry_msgs::PoseStamped
      * double err_th = threshold[rand() % threshold.size()];
      */
     
-	double threshold = 0.2;       //0.01 m || 0.03(m) || 0.05m || 0.1 m
+	double threshold = 0.1;       //0.01 m || 0.03(m) || 0.05m || 0.1 m
 	ROS_DEBUG("Next setpoint: accepted error threshold: %1.3f", threshold);
 	double distance = sqrt( (ps2 - ps1).x() * (ps2 - ps1).x() +
 							(ps2 - ps1).y() * (ps2 - ps1).y() + 
