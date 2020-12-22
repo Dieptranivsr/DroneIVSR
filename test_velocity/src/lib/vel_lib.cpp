@@ -94,7 +94,7 @@ geometry_msgs::Twist compute_velocity(geometry_msgs::PoseStamped e1, geometry_ms
 	tf::pointMsgToEigen(e2.pose.position, ps2);
 	
 	std::cout << "Estimated flight time: ";
-	timer1 = 4;
+	timer1 = 8;
 	std::cout << timer1 << std::endl;
 	//std::cin >> timer1;
 	
