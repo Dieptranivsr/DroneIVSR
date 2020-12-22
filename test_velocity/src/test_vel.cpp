@@ -74,15 +74,11 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
-    
-    geometry_msgs::PoseStamped pose_A, pose_B;
-    pose_A.pose.position.x = 0;
-    pose_A.pose.position.y = 0;
-    pose_A.pose.position.z = 2;
 
-    pose_B.pose.position.x = 4;
-    pose_B.pose.position.y = 0;
-    pose_B.pose.position.z = 2;
+    geometry_msgs::PoseStamped pose_A, pose_B;
+    pose_A.pose.position.x = current_pose.pose.position.x;
+    pose_A.pose.position.y = current_pose.pose.position.y;
+    pose_A.pose.position.z = current_pose.pose.position.z + 3;
     
     geometry_msgs::Twist vs;
     vs.linear.x = 0;
@@ -97,16 +93,6 @@ int main(int argc, char **argv)
     mavros_msgs::SetMavFrame mav_frame_set;
     mav_frame_set.request.mav_frame = 8;
     //set_mav_frame_client.call(mav_frame_set);
-        
-    //send a few setpoints before starting
-    for(int i = 100; ros::ok() && i > 0; --i){
-        local_pos_pub.publish(pose_A);
-        ros::spinOnce();
-        rate.sleep();
-    }
-    
-    ROS_INFO("Ready");
-    ros::Duration(3).sleep();
     
     ROS_INFO_STREAM("Are you run by velocity controller ? (y/n)");
     char a[100];
@@ -126,6 +112,17 @@ int main(int argc, char **argv)
     	}
     	count++;
     }
+    
+    //send a few setpoints before starting
+    for(int i = 100; ros::ok() && i > 0; --i){
+    	pose_A.header.stamp = ros::Time::now();
+        local_pos_pub.publish(pose_A);
+        ros::spinOnce();
+        rate.sleep();
+    }
+    
+    ROS_INFO("Ready");
+    ros::Duration(3).sleep();
     
     // publish target, keep drone hovering
     int mode = 1;
@@ -151,6 +148,9 @@ int main(int argc, char **argv)
             	Eigen::Vector3d cur1;
             	tf::pointMsgToEigen(current_pose.pose.position, cur1);
             	ROS_WARN("Use velocity to fly from A to B");
+                pose_B.pose.position.x = pose_A.pose.position.x + 4;
+                pose_B.pose.position.y = pose_A.pose.position.y;
+                pose_B.pose.position.z = pose_A.pose.position.z;
             	mode = 2;
             }
             break;
@@ -162,14 +162,21 @@ int main(int argc, char **argv)
     		if( count % 2 == 0)
     			ROS_INFO("Distance between current position and point B: %f (m)", v[count]);
 
-    		    //if( count > 1 && v[count] < 0.1 && v[count - 1] < v[count])
-    		    //{
-    		    	//ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
-    		    //	break;
-    		    //}
+    		//if( count > 1 && v[count] < 0.1 && v[count - 1] < v[count])
+    		//{
+    		    //ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
+    		//	break;
+    		//}
     		if( count > 1 && v[count] < 5 && v[count - 1] < v[count])
     		{
     		    ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
+    			ROS_WARN("The closest distance between the current position and the target position is %f (m)", v[count]);
+
+    			if( v[count] < 0.1)
+    				ROS_INFO("Post velocity was successfully");
+    			else{
+    				ROS_INFO("Post velocity was unsuccessfully");
+    			}
     		    mode = 3;
     		    break;
     		}
@@ -179,11 +186,11 @@ int main(int argc, char **argv)
     		break;
     	case 3:
     	    offb_set_mode.request.custom_mode = "AUTO.LAND";
-        	if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent){
-        		ROS_INFO("AUTO.LAND enabled");
-        		mode = 4;
-                break;
-        	}
+    	    if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent){
+    	    	ROS_INFO("AUTO.LAND enabled");
+    	    	mode = 4;
+    	    	break;
+    	    }
     	}
         if (mode == 4)
         	break;
