@@ -76,9 +76,6 @@ int main(int argc, char **argv)
     }
 
     geometry_msgs::PoseStamped pose_A, pose_B;
-    pose_A.pose.position.x = current_pose.pose.position.x;
-    pose_A.pose.position.y = current_pose.pose.position.y;
-    pose_A.pose.position.z = current_pose.pose.position.z + 3;
     
     geometry_msgs::Twist vs;
     vs.linear.x = 0;
@@ -113,6 +110,9 @@ int main(int argc, char **argv)
     	count++;
     }
     
+    pose_A.pose.position.x = current_pose.pose.position.x;
+    pose_A.pose.position.y = current_pose.pose.position.y;
+    pose_A.pose.position.z = current_pose.pose.position.z + 3;
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
     	pose_A.header.stamp = ros::Time::now();
