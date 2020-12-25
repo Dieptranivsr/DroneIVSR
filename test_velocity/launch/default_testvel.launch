@@ -1,0 +1,3 @@
+<launch>
+  <node name="default_testvel_node" pkg="test_velocity" type="default_testvel_node" output="screen"></node>
+</launch>
