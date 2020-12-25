@@ -8,7 +8,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/BatteryState.h>
 
-double _timer = 5; //travel time - fly from A to B
+double _timer; //travel time - fly from A to B
 /****** DEFINE CONSTANTS ******/
 #define td_PI 3.141592653589793238462643383279502884L
 
