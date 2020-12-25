@@ -63,8 +63,20 @@ add_executable(
   src/test_vel.cpp
 )
 
+add_executable(
+  default_testvel_node
+  src/default_test_vel.cpp
+)
+
+add_executable(
+  sitl_testvel_node
+  src/test_vel_org.cpp
+)
+
 add_dependencies(
   testvel_node
+  default_testvel_node
+  sitl_testvel_node
   diep_test_velocity
 )
 
@@ -73,8 +85,17 @@ target_link_libraries(
   diep_test_velocity
 )
 
+target_link_libraries(
+  default_testvel_node
+  diep_test_velocity
+)
+
+target_link_libraries(
+  sitl_testvel_node
+  diep_test_velocity
+)
 ## Mark executables and/or libraries for installation
-install(TARGETS diep_test_velocity testvel_node
+install(TARGETS diep_test_velocity testvel_node default_testvel_node sitl_testvel_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
