@@ -1,3 +1,0 @@
-<launch>
-  <node name="sitl_testvel_node" pkg="test_velocity" type="sitl_testvel_node" output="screen"></node>
-</launch>
