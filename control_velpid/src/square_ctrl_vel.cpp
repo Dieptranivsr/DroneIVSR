@@ -149,7 +149,9 @@ int main(int argc, char **argv)
 
 	ROS_INFO("Testing...");
 	std::vector<double> data_x, data_y, data_z, data_count;
+	std::vector<double> vtoc_x, vtoc_y, vtoc_z, vtoc_c;
 	double origin;
+	Eigen::Vector3d one;
 	while (ros::ok()) {
     	switch(mode)
     	{
@@ -173,25 +175,24 @@ int main(int argc, char **argv)
     		break;
     	case 2:
 			// motion routine
-			Eigen::Vector3d one;
 			tf::pointMsgToEigen(current_pose.pose.position, one);
 			ROS_WARN("Current position: (%f,%f,%f)", one.x(), one.y(), one.z());
 		
 			switch (pos_target) {
 			case 1:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 1, value_A.y() + 1, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 2, value_A.y() + 2, 2), ps.pose.position);
 				break;
 			case 2:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 1, value_A.y() + 1, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 2, value_A.y() + 2, 2), ps.pose.position);
 				break;
 			case 3:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 1, value_A.y() - 1, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 2, value_A.y() - 2, 2), ps.pose.position);
 				break;
 			case 4:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 1, value_A.y() - 1, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 2, value_A.y() - 2, 2), ps.pose.position);
 				break;
 			case 5:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 1, value_A.y() + 1, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 2, value_A.y() + 2, 2), ps.pose.position);
 				break;
 			default:
 				break;
@@ -215,7 +216,7 @@ int main(int argc, char **argv)
 					data_x.push_back(current.x());
 					data_y.push_back(current.y());
 					data_z.push_back(current.z());
-					data_count.push_back(count++);
+					data_count.push_back(count);
 					ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
 					batt_percent = current_batt.percentage * 100;
 					ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
@@ -231,6 +232,14 @@ int main(int argc, char **argv)
 					stop = true;
 
 				tf::vectorEigenToMsg(compute_linvel_effort(dest, current, last_time), vs.twist.linear);
+				if ((numxx-1) %5 == 0)
+				{
+					// push data to draw graph
+					vtoc_x.push_back(vs.twist.linear.x);
+					vtoc_y.push_back(vs.twist.linear.y);
+					vtoc_z.push_back(vs.twist.linear.z);
+					vtoc_c.push_back(count++);
+				}
 
 				vel_sp_pub.publish(vs);
 
@@ -243,19 +252,29 @@ int main(int argc, char **argv)
 				ROS_INFO("Test complete!");
 				ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
 				
+				offb_set_mode.request.custom_mode = "AUTO.LAND";
+    	    	if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
+    	    		ROS_INFO("AUTO.LAND enabled");				
+
 				//Export image path flight
 				std::string name1 = getName();
-				captureGraph(data_x, data_y, name1);
+				captureGraph(data_x, data_y, "toado_xy" + name1, 1280, 1280);
 				std::string name2 = getName();
-				captureGraph(data_count, data_z, name2);
-		    
-				// Shutdown Drone
-				ros::shutdown();
+				captureGraph(data_count, data_z, "toado_z" + name2, 1280, 360);
+
+				std::string name3 = getName();
+				captureGraph(data_x, data_y, "vantoc_xy" + name3, 1280, 1280);
+				std::string name4 = getName();
+				captureGraph(data_count, data_z, "vantoc_z" + name4, 1280, 360);
+
+				++pos_target;
 			}
 			else
 				++pos_target;
 			break;
     	}
+		if (pos_target == 7) 
+			break;
 	}
 
 	return 0;

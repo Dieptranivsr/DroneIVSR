@@ -661,14 +661,16 @@ int main(int argc, char **argv)
 				ROS_INFO("Test complete!");
 				ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
 				
+			offb_set_mode.request.custom_mode = "AUTO.LAND";
+    	    if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
+    	    	ROS_INFO("AUTO.LAND enabled");								
+
 				//Export image path flight
 			    std::string name1 = getName();
-			    captureGraph(xs1, ys1, name1);
+			    captureGraph(xs1, ys1, name1, 1280, 1280);
 			    std::string name2 = getName();
-			    captureGraph(zs1, ts1, name2);
-			    
-			    // Shutdown Drone
-				ros::shutdown();
+			    captureGraph(zs1, ts1, name2, 1280, 1280);
+
 			}
 			last_time = ros::Time::now();
 			loop_rate.sleep();

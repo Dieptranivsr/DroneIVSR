@@ -10,14 +10,14 @@
 #include <control_velpid/pbPlots.hpp>
 #include <control_velpid/supportLib.hpp>
 
-void captureGraph(std::vector<double> _xs, std::vector<double> _ys, std::string abc)
+void captureGraph(std::vector<double> _xs, std::vector<double> _ys, std::string abc, double cap_x, double cap_y)
 {
 	RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
 
 	//DrawScatterPlot(imageReference, 600, 400, &_xs, &_ys);
 	//DrawScatterPlot(imageReference, 1280, 720, &_xs, &_ys);
 	//DrawScatterPlot(imageReference, 1280, 1280, &_xs, &_ys); //1&2
-	DrawScatterPlot(imageReference, 1280, 360, &_xs, &_ys);
+	DrawScatterPlot(imageReference, cap_x, cap_y, &_xs, &_ys);
 
 	vector<double> *pngdata = ConvertToPNG(imageReference->image);
 	WriteToFile(pngdata, abc);
@@ -40,6 +40,6 @@ std::string getName()
 
     std::string str1 = ss[0].str() + ss[1].str() + ss[2].str() + ss[3].str() + ss[4].str() + ss[5].str();
 	std::cout << "Time : " << ss[0].str() << ":" << ss[1].str() << ":" << ss[2].str() << ", " << ss[3].str() << " " << ss[4].str() << " " <<  ss[5].str() << std::endl;
-	return("graph_" + str1 +".png");
+	return(str1 +".png");
 }
 
