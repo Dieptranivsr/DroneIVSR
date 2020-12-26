@@ -1,0 +1,4 @@
+<launch>
+    <node name="circle_velpid_node" pkg="control_velpid" type="circle_velpid_node" output="screen">
+    </node>
+</launch>

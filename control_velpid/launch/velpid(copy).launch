@@ -1,0 +1,17 @@
+<launch>
+    <!-- if use_pid is set, PID values should be configured -->
+    <arg name="linvel_p_gain" default="0.4" />     <!-- Proportional gain for linear velocity -->
+    <arg name="linvel_i_gain" default="0.05" />     <!-- Integral gain for linear velocity -->
+    <arg name="linvel_d_gain" default="0.12" />     <!-- Derivative gain for linear velocity -->
+    <arg name="linvel_i_max" default="0.1" />     <!-- Max integral windup for linear velocity -->
+    <arg name="linvel_i_min" default="-0.1" />     <!-- Min integral windup for linear velocity -->
+
+    <!--<node name="control_velpid_node" pkg="control_velpid" type="control_velpid_node" args="$(arg args)" required="true" clear_params="true" output="screen">-->
+    <node name="control_velpid_node" pkg="control_velpid" type="control_velpid_node" required="true" clear_params="true" output="screen">
+         <!--<param name="linvel_p_gain" value="$(arg linvel_p_gain)" />
+         <param name="linvel_i_gain" value="$(arg linvel_i_gain)" />
+         <param name="linvel_d_gain" value="$(arg linvel_d_gain)" />
+         <param name="linvel_i_max" value="$(arg linvel_i_max)" />
+         <param name="linvel_i_min" value="$(arg linvel_i_min)" />-->
+    </node>
+</launch>
