@@ -263,9 +263,9 @@ int main(int argc, char **argv)
 				captureGraph(data_count, data_z, "toado_z" + name2, 1280, 360);
 
 				std::string name3 = getName();
-				captureGraph(data_x, data_y, "vantoc_xy" + name3, 1280, 1280);
+				captureGraph(vtoc_x, vtoc_y, "vantoc_xy" + name3, 1280, 1280);
 				std::string name4 = getName();
-				captureGraph(data_count, data_z, "vantoc_z" + name4, 1280, 360);
+				captureGraph(vtoc_c, vtoc_z, "vantoc_z" + name4, 1280, 360);
 
 				++pos_target;
 			}
