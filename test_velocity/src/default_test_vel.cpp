@@ -93,7 +93,7 @@ int main(int argc, char **argv)
     
     ROS_INFO_STREAM("Are you run by velocity controller ? (y/n)");
     char a[100];
-	int count = 0;
+	int count = 0, vec;
     std::cin >> a;
     while (1)
     {
@@ -146,21 +146,24 @@ int main(int argc, char **argv)
             if( position_distance(current_pose, pose_A) == true)
             {
             	ROS_WARN("Use velocity to fly from A to B");
-                pose_B.pose.position.x = pose_A.pose.position.x + 8;
+                pose_B.pose.position.x = pose_A.pose.position.x + 10;
                 pose_B.pose.position.y = pose_A.pose.position.y;
                 pose_B.pose.position.z = pose_A.pose.position.z;
 
                 //compute velocity to fly from A to B
+				_timer = 10;
                 vs = compute_velocity(pose_A, pose_B, _timer);
-                set_mav_frame_client.call(mav_frame_set);
                 origin = ros::Time::now().toSec();
+				vec = count;
                 mode = 2;
             }
             break;
     	case 2:
     		vel_sp_pub.publish(vs);
     		v.push_back(distance(current_pose, pose_B));
-    		
+  			if( count == vec)
+				set_mav_frame_client.call(mav_frame_set);  		
+
     		if( count % 5 == 0)
     		{
     			ROS_INFO("Distance between current position and point B: %f (m)", v[count]);
@@ -179,7 +182,7 @@ int main(int argc, char **argv)
     		    //ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
     		//	break;
     		//}
-    		if( count > 1 && v[count] < 1 && v[count - 1] < v[count])
+    		if( count > 1 && v[count] < 2 && v[count - 1] < v[count])
     		{
     		    ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
     			ROS_WARN("The closest distance between the current position and the target position is %f (m)", v[count]);
