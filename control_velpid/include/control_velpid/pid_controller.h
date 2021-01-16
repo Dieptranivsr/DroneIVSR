@@ -44,3 +44,5 @@ double computeCommandY(double error, double error_dot, ros::Duration dt);
 double computeCommandZ(double error, double error_dot, ros::Duration dt);
 Eigen::Vector3d compute_linvel_effort(Eigen::Vector3d goal, Eigen::Vector3d current, ros::Time last_time);
 
+#define MAX_vel 2         // 3
+float bound(float v, float b);

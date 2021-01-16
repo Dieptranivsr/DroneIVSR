@@ -40,6 +40,6 @@ std::string getName()
 
     std::string str1 = ss[0].str() + ss[1].str() + ss[2].str() + ss[3].str() + ss[4].str() + ss[5].str();
 	std::cout << "Time : " << ss[0].str() << ":" << ss[1].str() << ":" << ss[2].str() << ", " << ss[3].str() << " " << ss[4].str() << " " <<  ss[5].str() << std::endl;
-	return(str1 +".png");
+	return(str1);
 }
 

@@ -191,10 +191,23 @@ double computeCommandZ(double error, double error_dot, ros::Duration dt)
 	return cmd_z;
 }
 
+// Function to bound the values of "v" between +/- "b"
+float bound(float v, float b){
+    if(v < -b)
+        return -b;
+    if(v > b)
+        return b;
+    return v;
+}
+
 Eigen::Vector3d compute_linvel_effort(Eigen::Vector3d goal, Eigen::Vector3d current, ros::Time last_time){
 	double lin_vel_x = computeCommand_x(goal.x() - current.x(), ros::Time::now() - last_time);
 	double lin_vel_y = computeCommand_y(goal.y() - current.y(), ros::Time::now() - last_time);
 	double lin_vel_z = computeCommand_z(goal.z() - current.z(), ros::Time::now() - last_time);
+
+	lin_vel_x = bound(lin_vel_x, MAX_vel);
+	lin_vel_y = bound(lin_vel_y, MAX_vel);
+	lin_vel_z = bound(lin_vel_z, MAX_vel);
 
 	return Eigen::Vector3d(lin_vel_x, lin_vel_y, lin_vel_z);
 }

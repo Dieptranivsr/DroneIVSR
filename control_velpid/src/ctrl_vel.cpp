@@ -25,7 +25,6 @@ Eigen::Vector3d current;
 
 int count = 0, numxx=0;
 
-/*
 int main(int argc, char **argv)
 {	
 	//
@@ -54,12 +53,18 @@ int main(int argc, char **argv)
 	threshold = threshold_definition();
 	
 	double rate = 20.0;
+	//double linvel_p_gain = 0.4;         //1.4, 0.8
+	//double linvel_i_gain = 0.05;        //-------- 0,1           0.2
+	//double linvel_d_gain = 0.12;        //------------ 0.24, 0.2 0.4
+	//double linvel_i_max = 0.1;
+	//double linvel_i_min = -0.1;
+	
 	double linvel_p_gain = 0.4;
-	double linvel_i_gain = 0.05;
-	double linvel_d_gain = 0.12;
-	double linvel_i_max = 0.1;
-	double linvel_i_min = -0.1;
-
+	double linvel_i_gain = 0.2;
+	double linvel_d_gain = 0.4;
+	double linvel_i_max = 1.1;
+	double linvel_i_min = -1.1;
+	
 	// Linear velocity PID gains and bound of integral windup	
 	//double linvel_p_gain;
 	//double linvel_i_gain;
@@ -87,7 +92,7 @@ int main(int argc, char **argv)
     geometry_msgs::PoseStamped pose_A;
     pose_A.pose.position.x = 0;
     pose_A.pose.position.y = 0;
-    pose_A.pose.position.z = 2;
+    pose_A.pose.position.z = 3;
     
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
@@ -123,7 +128,7 @@ int main(int argc, char **argv)
                 if( arming_client.call(arm_cmd) &&
                     arm_cmd.response.success){
                     ROS_INFO("Vehicle armed");
-                    ROS_INFO("Post position at (0,0,2)");
+                    ROS_INFO("Post position at (0,0,3)");
                 }
                 last_request = ros::Time::now();
             }
@@ -149,6 +154,7 @@ int main(int argc, char **argv)
 
 	ROS_INFO("Testing...");
 	std::vector<double> xs1, ys1, zs1, ts1;
+	std::vector<double> vel_x, vel_y, vel_z;
 	while (ros::ok()) {
 		set_mav_frame_client.call(mav_frame_set);
 		// motion routine
@@ -158,19 +164,19 @@ int main(int argc, char **argv)
 		
 		switch (pos_target) {
 		case 1:
-			tf::pointEigenToMsg(pos_setpoint(1, 1, 1), ps.pose.position);
+			tf::pointEigenToMsg(pos_setpoint(3, 3, 3), ps.pose.position);
 			break;
 		case 2:
-			tf::pointEigenToMsg(pos_setpoint(-1, 1, 1), ps.pose.position);
+			tf::pointEigenToMsg(pos_setpoint(-3, 3, 3), ps.pose.position);
 			break;
 		case 3:
-			tf::pointEigenToMsg(pos_setpoint(-1, -1, 1), ps.pose.position);
+			tf::pointEigenToMsg(pos_setpoint(-3, -3, 3), ps.pose.position);
 			break;
 		case 4:
-			tf::pointEigenToMsg(pos_setpoint(1, -1, 1), ps.pose.position);
+			tf::pointEigenToMsg(pos_setpoint(3, -3, 3), ps.pose.position);
 			break;
 		case 5:
-			tf::pointEigenToMsg(pos_setpoint(1, 1, 1), ps.pose.position);
+			tf::pointEigenToMsg(pos_setpoint(3, 3, 3), ps.pose.position);
 			break;
 		default:
 			break;
@@ -202,6 +208,10 @@ int main(int argc, char **argv)
 				ys1.push_back(current.y());
 				zs1.push_back(current.z());
 				ts1.push_back(count++);
+				
+				vel_x.push_back(vs.twist.linear.x);
+				vel_y.push_back(vs.twist.linear.y);
+				vel_z.push_back(vs.twist.linear.z);
 				ROS_INFO("Current position: (%f,%f,%f)", current.x(), current.y(), current.z());
 			}
 				
@@ -228,10 +238,26 @@ int main(int argc, char **argv)
 			ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
 			
 			//Export image path flight
-		    std::string name1 = getName();
-		    captureGraph(xs1, ys1, name1);
-		    std::string name2 = getName();
-		    captureGraph(zs1, ts1, name2);
+			std::string name1 = getName();
+			/*
+			captureGraph(xs1, ys1, "toado_xy" + name1, 1280, 1280);
+			captureGraph(zs1, ts1, "toado_z" + name1, 1280, 360);
+			
+			captureGraph(ts1, vel_x, "vantoc_x" + name1, 1280, 360);
+			captureGraph(ts1, vel_y, "vantoc_y" + name1, 1280, 360);
+			captureGraph(ts1, vel_z, "vantoc_z" + name1, 1280, 360);
+			*/
+			
+			///home/dieptran/Documents/diep_ws/src/control_velpid/data_flight
+			//std::string filePath = "C:/Users/ADMIN/Desktop/my_document.txt";
+			
+			//std::string filePath = "/home/dieptran/Documents/diep_ws/src/control_velpid/data_flight/";
+			captureGraph(xs1, ys1, name1 + "toado_xy", 1280, 1280);
+			captureGraph(zs1, ts1, name1 + "toado_z", 1280, 360);
+			
+			captureGraph(ts1, vel_x, name1 + "vantoc_x", 1280, 360);
+			captureGraph(ts1, vel_y, name1 + "vantoc_y", 1280, 360);
+			captureGraph(ts1, vel_z, name1 + "vantoc_z", 1280, 360);
 		    
 		    // Shutdown Drone
 			ros::shutdown();
@@ -245,7 +271,7 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-*/
+
 
 /*
 int main(int argc, char **argv)
@@ -484,8 +510,9 @@ void square_path_motion(ros::Rate loop_rate){
 		ros::spinOnce();
 	}
 }
-*/
 
+
+/*
 
 int main(int argc, char **argv)
 {	
@@ -680,7 +707,7 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-
+*/
 
 /*
 int main(int argc, char **argv)

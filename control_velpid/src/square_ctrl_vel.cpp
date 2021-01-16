@@ -28,7 +28,7 @@ int count = 0, numxx=0;
 
 double distance;
 //double err_th = threshold[rand() % threshold.size()];
-double err_th = 0.1;
+double err_th = 0.15;
 bool stop;
 
 ros::Time last_time;
@@ -42,12 +42,12 @@ int main(int argc, char **argv)
 	ros::NodeHandle td;
 	
 	// Subcriber
-    ros::Subscriber state_sub = td.subscribe<mavros_msgs::State>
-            ("mavros/state", 10, state_cb);
+	ros::Subscriber state_sub = td.subscribe<mavros_msgs::State>
+			("mavros/state", 10, state_cb);
 	ros::Subscriber local_pose_sub = td.subscribe<geometry_msgs::PoseStamped>
 			("/mavros/local_position/pose", 10, local_pos_cb);
 	ros::Subscriber batt_sub = td.subscribe<sensor_msgs::BatteryState> 
-            ("mavros/battery", 10, battery_cb);
+			("mavros/battery", 10, battery_cb);
 
 	ros::Publisher local_pos_sp_pub = td.advertise<geometry_msgs::PoseStamped>
 			("/mavros/setpoint_position/local", 10);
@@ -61,17 +61,22 @@ int main(int argc, char **argv)
 	ros::ServiceClient set_mav_frame_client = td.serviceClient<mavros_msgs::SetMavFrame>
 			("mavros/setpoint_velocity/mav_frame");
 	
-	
 	threshold = threshold_definition();
 	
 	// Linear velocity PID gains and bound of integral windup
 	double rate = 20.0;
-	double linvel_p_gain = 0.4;
-	double linvel_i_gain = 0.05;
-	double linvel_d_gain = 0.12;
-	double linvel_i_max = 0.1;
-	double linvel_i_min = -0.1;
+	//double linvel_p_gain = 0.4;
+	//double linvel_i_gain = 0.05;
+	//double linvel_d_gain = 0.12;
+	//double linvel_i_max = 0.1;
+	//double linvel_i_min = -0.1;
 
+	double linvel_p_gain = 0.4;
+	double linvel_i_gain = 0.2;
+	double linvel_d_gain = 0.4;
+	double linvel_i_max = 1.1;
+	double linvel_i_min = -1.1;
+	
 	// Setup of the PID controllers
 	setup_livel_pid(linvel_p_gain, linvel_i_gain, linvel_d_gain, linvel_i_max, linvel_i_min);
 	
@@ -129,7 +134,7 @@ int main(int argc, char **argv)
     Eigen::Vector3d value_A;
     pose_A.pose.position.x = current_pose.pose.position.x;
     pose_A.pose.position.y = current_pose.pose.position.y;
-    pose_A.pose.position.z = current_pose.pose.position.z + 2;
+    pose_A.pose.position.z = current_pose.pose.position.z + 3;
     tf::pointMsgToEigen(pose_A.pose.position, value_A);
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
@@ -180,19 +185,19 @@ int main(int argc, char **argv)
 		
 			switch (pos_target) {
 			case 1:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 2, value_A.y() + 2, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 3), ps.pose.position);
 				break;
 			case 2:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 2, value_A.y() + 2, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 3, value_A.y() + 3, 3), ps.pose.position);
 				break;
 			case 3:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 2, value_A.y() - 2, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 3, value_A.y() - 3, 3), ps.pose.position);
 				break;
 			case 4:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 2, value_A.y() - 2, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() - 3, 3), ps.pose.position);
 				break;
 			case 5:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 2, value_A.y() + 2, 2), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 3), ps.pose.position);
 				break;
 			default:
 				break;
@@ -253,19 +258,17 @@ int main(int argc, char **argv)
 				ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
 				
 				offb_set_mode.request.custom_mode = "AUTO.LAND";
-    	    	if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
-    	    		ROS_INFO("AUTO.LAND enabled");				
+				if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
+					ROS_INFO("AUTO.LAND enabled");				
 
 				//Export image path flight
-				std::string name1 = getName();
-				captureGraph(data_x, data_y, "toado_xy" + name1, 1280, 1280);
-				std::string name2 = getName();
-				captureGraph(data_count, data_z, "toado_z" + name2, 1280, 360);
+				std::string date_time = getName();
+				captureGraph(data_x, data_y, "toado_xy" + date_time, 1280, 1280);
+				captureGraph(data_count, data_z, "toado_z" + date_time, 1280, 360);
 
-				std::string name3 = getName();
-				captureGraph(vtoc_x, vtoc_y, "vantoc_xy" + name3, 1280, 1280);
-				std::string name4 = getName();
-				captureGraph(vtoc_c, vtoc_z, "vantoc_z" + name4, 1280, 360);
+				captureGraph(vtoc_c, vtoc_x, "vantoc_x" + date_time, 1280, 360);
+				captureGraph(vtoc_c, vtoc_y, "vantoc_y" + date_time, 1280, 360);
+				captureGraph(vtoc_c, vtoc_z, "vantoc_z" + date_time, 1280, 360);
 
 				++pos_target;
 			}
