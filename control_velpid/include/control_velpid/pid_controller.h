@@ -6,7 +6,7 @@
 #include <mavros_msgs/State.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <eigen_conversions/eigen_msg.h>
-
+#include <eigen3/Eigen/Dense>
 /*
  * PID Controllers (from line 11th to 46)
  */
@@ -20,8 +20,8 @@ double p_error_x = 0.0; 				/**< Position error. */
 double p_error_y = 0.0;
 double p_error_z = 0.0;
 double i_error_x = 0.0; 				/**< Integral of position error. */
-double i_error_y = 0.0; 
-double i_error_z = 0.0; 
+double i_error_y = 0.0;
+double i_error_z = 0.0;
 double d_error_x = 0.0; 				/**< Derivative of position error. */
 double d_error_y = 0.0;
 double d_error_z = 0.0;
@@ -39,10 +39,11 @@ void setup_livel_pid(double p_gain, double i_gain, double d_gain, double i_max, 
 double computeCommand_x(double error, ros::Duration dt);
 double computeCommand_y(double error, ros::Duration dt);
 double computeCommand_z(double error, ros::Duration dt);
+
 double computeCommandX(double error, double error_dot, ros::Duration dt);
 double computeCommandY(double error, double error_dot, ros::Duration dt);
 double computeCommandZ(double error, double error_dot, ros::Duration dt);
 Eigen::Vector3d compute_linvel_effort(Eigen::Vector3d goal, Eigen::Vector3d current, ros::Time last_time);
 
-#define MAX_vel 2         // 3
+#define MAX_vel 3         // 3 // 1
 float bound(float v, float b);

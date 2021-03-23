@@ -64,6 +64,7 @@ include_directories(
 add_library(control_velpid_lib
   src/lib/velpid_lib.cpp
   src/lib/pid_controller.cpp
+  src/lib/pid_controllerv2.cpp
   src/lib/captureGraph.cpp
   src/lib/pbPlots.cpp
   src/lib/supportLib.cpp
@@ -92,9 +93,21 @@ add_executable(
 #  src/circle_ctrl_vel.cpp
 #)
 
+add_executable(
+  control_v2
+  src/controlv2.cpp
+)
+
+add_executable(
+  control_worldframe
+  src/control_worldframe.cpp
+)
+
 add_dependencies(
   control_velpid_node
   square_velpid_node
+  control_v2
+  control_worldframe
   #circle_velpid_node
   control_velpid_lib
 )
@@ -115,9 +128,18 @@ target_link_libraries(
 #  control_velpid_lib
 #)
 
+target_link_libraries(
+  control_v2
+  control_velpid_lib
+)
+
+target_link_libraries(
+  control_worldframe
+  control_velpid_lib
+)
 
 ## Mark executables and/or libraries for installation
-install(TARGETS control_velpid_lib control_velpid_node square_velpid_node #circle_velpid_node
+install(TARGETS control_velpid_lib control_velpid_node square_velpid_node #circle_velpid_node control_v2 control_worldframe
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}

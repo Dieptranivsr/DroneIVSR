@@ -53,17 +53,17 @@ int main(int argc, char **argv)
 	threshold = threshold_definition();
 	
 	double rate = 20.0;
-	//double linvel_p_gain = 0.4;         //1.4, 0.8
-	//double linvel_i_gain = 0.05;        //-------- 0,1           0.2
-	//double linvel_d_gain = 0.12;        //------------ 0.24, 0.2 0.4
-	//double linvel_i_max = 0.1;
-	//double linvel_i_min = -0.1;
+	double linvel_p_gain = 0.4;         //1.4, 0.8
+	double linvel_i_gain = 0.05;        //-------- 0,1           0.2
+	double linvel_d_gain = 0.12;        //------------ 0.24, 0.2 0.4
+	double linvel_i_max = 0.1;
+	double linvel_i_min = -0.1;
 	
-	double linvel_p_gain = 0.4;
-	double linvel_i_gain = 0.2;
-	double linvel_d_gain = 0.4;
-	double linvel_i_max = 1.1;
-	double linvel_i_min = -1.1;
+	//double linvel_p_gain = 0.4;
+	//double linvel_i_gain = 0.2;
+	//double linvel_d_gain = 0.4;
+	//double linvel_i_max = 1.1;
+	//double linvel_i_min = -1.1;
 	
 	// Linear velocity PID gains and bound of integral windup	
 	//double linvel_p_gain;
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 
     //add
     mavros_msgs::SetMavFrame mav_frame_set;
-    mav_frame_set.request.mav_frame = 8;
+    //mav_frame_set.request.mav_frame = 8;
     
     ros::Time last_request = ros::Time::now();
     double origin;  //Compute time of flight
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 	std::vector<double> xs1, ys1, zs1, ts1;
 	std::vector<double> vel_x, vel_y, vel_z;
 	while (ros::ok()) {
-		set_mav_frame_client.call(mav_frame_set);
+		//set_mav_frame_client.call(mav_frame_set);
 		// motion routine
         Eigen::Vector3d one;
         tf::pointMsgToEigen(current_pose.pose.position, one);

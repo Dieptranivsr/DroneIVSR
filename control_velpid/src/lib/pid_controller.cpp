@@ -4,7 +4,7 @@
 
 #include <ros/ros.h>
 #include <eigen_conversions/eigen_msg.h>
-
+#include <eigen3/Eigen/Dense>
 #include <control_velpid/pid_controller.h>
 
 void setup_livel_pid(double p_gain, double i_gain, double d_gain, double i_max, double i_min)
@@ -18,7 +18,7 @@ void setup_livel_pid(double p_gain, double i_gain, double d_gain, double i_max, 
 	i_min_ = i_min;
 	i_max_ = i_max;
 	
-	ROS_INFO("PID: %f, %f, %f", p_gain_, i_gain_, d_gain_);
+	//ROS_INFO("PID: %f, %f, %f", p_gain_, i_gain_, d_gain_);
 }
 
 double computeCommand_x(double error, ros::Duration dt)
@@ -211,4 +211,3 @@ Eigen::Vector3d compute_linvel_effort(Eigen::Vector3d goal, Eigen::Vector3d curr
 
 	return Eigen::Vector3d(lin_vel_x, lin_vel_y, lin_vel_z);
 }
-
