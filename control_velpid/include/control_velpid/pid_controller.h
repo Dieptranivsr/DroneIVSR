@@ -44,6 +44,10 @@ double computeCommandX(double error, double error_dot, ros::Duration dt);
 double computeCommandY(double error, double error_dot, ros::Duration dt);
 double computeCommandZ(double error, double error_dot, ros::Duration dt);
 Eigen::Vector3d compute_linvel_effort(Eigen::Vector3d goal, Eigen::Vector3d current, ros::Time last_time);
+//Eigen::Vector3d compute_linvel_effort(geometry_msgs::PoseStamped goal, geometry_msgs::PoseStamped current, ros::Time last_time);
 
 #define MAX_vel 3         // 3 // 1
 float bound(float v, float b);
+
+//Eigen::Vector3d _goal, _current;
+

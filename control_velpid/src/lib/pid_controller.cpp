@@ -211,3 +211,21 @@ Eigen::Vector3d compute_linvel_effort(Eigen::Vector3d goal, Eigen::Vector3d curr
 
 	return Eigen::Vector3d(lin_vel_x, lin_vel_y, lin_vel_z);
 }
+
+/*
+Eigen::Vector3d compute_linvel_effort(geometry_msgs::PoseStamped goal, geometry_msgs::PoseStamped current, ros::Time last_time){
+	Eigen::Vector3d _goal, _current;
+	tf::pointMsgToEigen(goal.pose.position, _goal);
+	tf::pointMsgToEigen(current.pose.position, _current);
+
+	double lin_vel_x = computeCommand_x(_goal(0) - _current(0), ros::Time::now() - last_time);
+	double lin_vel_y = computeCommand_y(_goal(1) - _current(1), ros::Time::now() - last_time);
+	double lin_vel_z = computeCommand_z(_goal(2) - _current(2), ros::Time::now() - last_time);
+
+	lin_vel_x = bound(lin_vel_x, MAX_vel);
+	lin_vel_y = bound(lin_vel_y, MAX_vel);
+	lin_vel_z = bound(lin_vel_z, MAX_vel);
+
+	return Eigen::Vector3d(lin_vel_x, lin_vel_y, lin_vel_z);
+}
+*/
