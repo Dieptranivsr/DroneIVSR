@@ -499,14 +499,14 @@ int main( int argc, char **argv)
     		//ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
     		local_pos_sp_pub.publish(pose_A);
-    		loop_rate.sleep();
-    		ros::spinOnce();
 
     		if(_position_distance(current_pose, pose_A) < 0.06)
     		{
     		   	ROS_WARN("Use PID velocity to fly from A to B");
     		    mode = 2;
     		    _last_time = ros::Time::now();
+    		    loop_rate.sleep();
+    		    ros::spinOnce();
     		}
     		break;
     	case 2:
@@ -521,18 +521,17 @@ int main( int argc, char **argv)
         	vel_sp_pub.publish(vel_msg);
         	if (_position_distance(current_pose, pose_B) < 0.06)
         		mode = 3;
+        	break;
     	case 3:
     		offb_set_mode.request.custom_mode = "AUTO.LAND";
     		if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
+    		{
     			ROS_INFO("AUTO.LAND enabled");
+    			break;
+    		}
+    		break;
     	}
 	}
 	return 0;
 }
-
-
-
-
-
-
 
