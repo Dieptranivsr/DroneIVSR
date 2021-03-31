@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   tf2_ros
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -42,7 +43,7 @@ endif()
 catkin_package(
   #INCLUDE_DIRS include
   #LIBRARIES control_velpid
-  CATKIN_DEPENDS angles eigen_conversions geometry_msgs mavros mavros_extras roscpp std_msgs tf2_ros
+  CATKIN_DEPENDS angles eigen_conversions geometry_msgs mavros mavros_extras roscpp std_msgs tf2_ros visualization_msgs
   DEPENDS Boost
 )
 
@@ -103,12 +104,34 @@ add_executable(
   src/control_worldframe.cpp
 )
 
+add_executable(
+  square_path
+  src/square_path.cpp
+)
+
+############ HITL ###############
+add_executable(
+  point2point
+  src/hitl/points.cpp
+)
+
+add_executable(
+  squarepath
+  src/hitl/square.cpp
+)
+#################################
+
 add_dependencies(
+  # SITL
   control_velpid_node
   square_velpid_node
   control_v2
   control_worldframe
+  square_path
   #circle_velpid_node
+  # HITL
+  point2point
+  squarepath
   control_velpid_lib
 )
 
@@ -138,8 +161,23 @@ target_link_libraries(
   control_velpid_lib
 )
 
+target_link_libraries(
+  square_path
+  control_velpid_lib
+)
+
+target_link_libraries(
+  point2point
+  control_velpid_lib
+)
+
+target_link_libraries(
+  squarepath
+  control_velpid_lib
+)
+
 ## Mark executables and/or libraries for installation
-install(TARGETS control_velpid_lib control_velpid_node square_velpid_node #circle_velpid_node control_v2 control_worldframe
+install(TARGETS control_velpid_lib control_velpid_node square_velpid_node square_path control_worldframe point2point squarepath #circle_velpid_node control_v2 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
