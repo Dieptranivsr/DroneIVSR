@@ -177,6 +177,11 @@ int main(int argc, char **argv)
     	switch(mode)
     	{
     	case 1:
+    		points.points.push_back(current_pose.pose.position);
+	        line_strip.points.push_back(current_pose.pose.position);
+	        marker_pub.publish(points);
+	        marker_pub.publish(line_strip);
+
     		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
     		batt_percent = current_batt.percentage * 100;
     		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
@@ -227,6 +232,11 @@ int main(int argc, char **argv)
 			// Defines the accepted threshold to the destination/target position before moving to the next setpoint.
 			//
 			while (!stop) {
+	    		points.points.push_back(current_pose.pose.position);
+		        line_strip.points.push_back(current_pose.pose.position);
+		        marker_pub.publish(points);
+		        marker_pub.publish(line_strip);
+
 				loop_rate.sleep();
 				ros::spinOnce();
 

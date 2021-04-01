@@ -178,8 +178,6 @@ int main( int argc, char **argv)
 
 	ROS_INFO("Testing...");
 	while (ros::ok()) {
-		loop_rate.sleep();
-		ros::spinOnce();
     	switch(mode)
     	{
     	case 1:
