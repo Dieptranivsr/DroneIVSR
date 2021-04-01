@@ -28,7 +28,7 @@ int count = 0, numxx=0;
 
 double distance;
 //double err_th = threshold[rand() % threshold.size()];
-double err_th = 0.15;
+double err_th = 0.3;
 bool stop;
 
 ros::Time last_time;

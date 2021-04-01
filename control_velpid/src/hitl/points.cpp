@@ -150,9 +150,9 @@ int main( int argc, char **argv)
     geometry_msgs::PoseStamped pose_A;
     pose_A.pose.position.x = current_pose.pose.position.x;
     pose_A.pose.position.y = current_pose.pose.position.y;
-    pose_A.pose.position.z = current_pose.pose.position.z + 3;
+    pose_A.pose.position.z = current_pose.pose.position.z + 5;
 
-    Eigen::Vector3d pose_goal(current_pose.pose.position.x, current_pose.pose.position.y + 5, current_pose.pose.position.z + 3);
+    Eigen::Vector3d pose_goal(current_pose.pose.position.x + 7, current_pose.pose.position.y, current_pose.pose.position.z + 5);
 
     geometry_msgs::PoseStamped pose_B;
     pose_B.pose.position.x = pose_goal(0);
@@ -187,7 +187,7 @@ int main( int argc, char **argv)
 
     		local_pos_sp_pub.publish(pose_A);
 
-    		if(_position_distance(current_pose, pose_A) < 0.06)
+    		if(_position_distance(current_pose, pose_A) < 0.2)
     		{
     		   	ROS_WARN("Use PID velocity to fly from A to B");
     		    mode = 2;
@@ -206,7 +206,7 @@ int main( int argc, char **argv)
 
     		_last_time = ros::Time::now();
         	vel_sp_pub.publish(vel_msg);
-        	if (_position_distance(current_pose, pose_B) < 0.06)
+        	if (_position_distance(current_pose, pose_B) < 0.2)
         		mode = 3;
         	break;
     	case 3:
