@@ -61,7 +61,7 @@ int main( int argc, char **argv)
 			("/mavros/setpoint_velocity/cmd_vel", 10);
 
 	ros::Publisher marker_pub = td.advertise<visualization_msgs::Marker>
-		    	("visualization_marker", 10);
+			("visualization_marker", 10);
 	// the setpoint publishing rate MUST be faster than 2Hz
 	int rate = 20;
 	ros::Rate loop_rate(rate);
@@ -73,16 +73,18 @@ int main( int argc, char **argv)
 	double linvel_i_min = -0.1;
 	setup_livel_pid(linvel_p_gain, linvel_i_gain, linvel_d_gain, linvel_i_max, linvel_i_min);
 
-	visualization_msgs::Marker points, line_strip;
-	points.header.frame_id = line_strip.header.frame_id = "map";
-	points.header.stamp = line_strip.header.stamp = ros::Time::now();
-	points.ns = line_strip.ns = "points_and_lines";
-	points.action = line_strip.action = visualization_msgs::Marker::ADD;
+	visualization_msgs::Marker points, line_strip, landmark;
+	points.header.frame_id = line_strip.header.frame_id = landmark.header.frame_id = "map";
+	points.header.stamp = line_strip.header.stamp = landmark.header.stamp = ros::Time::now();
+	points.ns = line_strip.ns = landmark.ns = "points_and_lines";
+	points.action = line_strip.action = landmark.action = visualization_msgs::Marker::ADD;
 	points.id = 0;
 	line_strip.id = 1;
+	landmark.id = 2;
 	points.type = visualization_msgs::Marker::SPHERE_LIST;         // POINTS, SPHERE_LIST
 	line_strip.type = visualization_msgs::Marker::LINE_STRIP;
-	points.pose.orientation.w = line_strip.pose.orientation.w = 1.0;
+	landmark.type = visualization_msgs::Marker::POINTS;
+	points.pose.orientation.w = line_strip.pose.orientation.w = landmark.pose.orientation.w = 1.0;
 
 	// POINTS markers use x and y scale for width/height respectively
 	points.scale.x = 0.05;         // 0.05, 0.1
@@ -90,37 +92,45 @@ int main( int argc, char **argv)
 	points.scale.z = 0.05;
 
 	line_strip.scale.x = 0.03;
-	line_strip.scale.x = 0.03;
-	line_strip.scale.x = 0.03;
+	line_strip.scale.y = 0.03;
+	line_strip.scale.z = 0.03;
 
+	landmark.scale.x = 0.1;
+	landmark.scale.y = 0.1;
+	landmark.scale.z = 0.1;
+	
 	// Points are green
 	points.color.g = 1.0f;
 	points.color.a = 1.0;
 
 	// Line strip is blue
-	line_strip.color.r = 1.0;
+	line_strip.color.b = 1.0;
 	line_strip.color.a = 1.0;
+	
+	// Landmark is blue
+	landmark.color.r = 1.0;
+	landmark.color.a = 1.0;
 
 	// wait for FCU connection
 	ROS_INFO("Waiting for FCU connection .");
 	while(ros::ok() && current_state.connected){
-        	//ROS_INFO_ONCE("Waiting for FCU connection ...");
-	   		std::cout << ".";
-        	ros::spinOnce();
-	        loop_rate.sleep();
+		//ROS_INFO_ONCE("Waiting for FCU connection ...");
+		std::cout << ".";
+		ros::spinOnce();
+		loop_rate.sleep();
 	}
 	ROS_INFO("FCU connected");
 
 	// check current pose
 	float batt_percent;
 	for(int i = 100; ros::ok() && i > 0; --i){
-    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
 
-	    	float batt_percent = current_batt.percentage * 100;
-    		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+		float batt_percent = current_batt.percentage * 100;
+		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
-    		ros::spinOnce();
-	        loop_rate.sleep();
+		ros::spinOnce();
+		loop_rate.sleep();
 	}
 
 	mavros_msgs::SetMode offb_set_mode;
@@ -132,18 +142,18 @@ int main( int argc, char **argv)
 	std::cin >> a;
 	while (1)
 	{
-	    	if (count > 10)
-    			ros::shutdown();
+		if (count > 10)
+			ros::shutdown();
 
-	    	if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
-    			break;
-    		else
+		if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
+			break;
+		else
 		{
-    			ROS_WARN("Can you retype your choice ?");
+			ROS_WARN("Can you retype your choice ?");
 			ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
 			std::cin >> a;
-    		}
-	    	count++;
+		}
+		count++;
 	}
 
 	Eigen::Vector3d value_A;
@@ -151,6 +161,8 @@ int main( int argc, char **argv)
 	pose_A.pose.position.x = current_pose.pose.position.x;
 	pose_A.pose.position.y = current_pose.pose.position.y;
 	pose_A.pose.position.z = current_pose.pose.position.z + 5;
+	landmark.points.push_back(pose_A.pose.position);
+	marker_pub.publish(landmark);
 
 	Eigen::Vector3d pose_goal(current_pose.pose.position.x + 7, current_pose.pose.position.y, current_pose.pose.position.z + 5);
 
@@ -158,12 +170,14 @@ int main( int argc, char **argv)
 	pose_B.pose.position.x = pose_goal(0);
 	pose_B.pose.position.y = pose_goal(1);
 	pose_B.pose.position.z = pose_goal(2);
+	landmark.points.push_back(pose_B.pose.position);
+	marker_pub.publish(landmark);
 
 	//send a few setpoints before starting
 	for(int i = 100; ros::ok() && i > 0; --i){
-    		pose_A.header.stamp = ros::Time::now();
-	   	local_pos_sp_pub.publish(pose_A);
-        	ros::spinOnce();
+		pose_A.header.stamp = ros::Time::now();
+		local_pos_sp_pub.publish(pose_A);
+		ros::spinOnce();
 		loop_rate.sleep();
 	}
 

@@ -59,7 +59,7 @@ int main( int argc, char **argv)
 			("/mavros/setpoint_velocity/cmd_vel", 10);
 
 	ros::Publisher marker_pub = td.advertise<visualization_msgs::Marker>
-	    		("visualization_marker", 10);
+			("visualization_marker", 10);
 
 	// threshold = threshold_definition();
 
@@ -96,16 +96,18 @@ int main( int argc, char **argv)
     geometry_msgs::TwistStamped vel_msg;
     double _z;
 
-    visualization_msgs::Marker points, line_strip;
-    points.header.frame_id = line_strip.header.frame_id = "map";
-    points.header.stamp = line_strip.header.stamp = ros::Time::now();
-    points.ns = line_strip.ns = "points_and_lines";
-    points.action = line_strip.action = visualization_msgs::Marker::ADD;
+    visualization_msgs::Marker points, line_strip, landmark;
+    points.header.frame_id = line_strip.header.frame_id = landmark.header.frame_id = "map";
+    points.header.stamp = line_strip.header.stamp = landmark.header.stamp = ros::Time::now();
+    points.ns = line_strip.ns = landmark.ns = "points_and_lines";
+    points.action = line_strip.action = landmark.action = visualization_msgs::Marker::ADD;
     points.id = 0;
     line_strip.id = 1;
+    landmark.id = 2;
     points.type = visualization_msgs::Marker::SPHERE_LIST;         // POINTS, SPHERE_LIST
     line_strip.type = visualization_msgs::Marker::LINE_STRIP;
-    points.pose.orientation.w = line_strip.pose.orientation.w = 1.0;
+    landmark.type = visualization_msgs::Marker::POINTS;
+    points.pose.orientation.w = line_strip.pose.orientation.w = landmark.pose.orientation.w = 1.0;
 
     // POINTS markers use x and y scale for width/height respectively
     points.scale.x = 0.05;         // 0.05, 0.1
@@ -116,13 +118,21 @@ int main( int argc, char **argv)
     line_strip.scale.x = 0.03;
     line_strip.scale.x = 0.03;
 
+    landmark.scale.x = 0.1;
+    landmark.scale.y = 0.1;
+    landmark.scale.z= 0.1;
+
     // Points are green
     points.color.g = 1.0f;
     points.color.a = 1.0;
 
     // Line strip is blue
-    line_strip.color.r = 1.0;
+    line_strip.color.b = 1.0;
     line_strip.color.a = 1.0;
+
+    // Landmark is red
+    landmark.color.r = 1.0;
+    landmark.color.a = 1.0;
 
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
@@ -138,6 +148,11 @@ int main( int argc, char **argv)
 
     ros::Time last_request = ros::Time::now();
     ros::Time time_2;
+
+    landmark.points.push_back(pose_A.pose.position);
+    marker_pub.publish(landmark);
+    landmark.points.push_back(pose_B.pose.position);
+    marker_pub.publish(landmark);
 
     while(ros::ok()){
         if( current_state.mode != "OFFBOARD" &&
