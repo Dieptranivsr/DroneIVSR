@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 			("/mavros/setpoint_velocity/cmd_vel", 10);
 
 	ros::Publisher marker_pub = td.advertise<visualization_msgs::Marker>
-	    	("visualization_marker", 10);
+			("visualization_marker", 10);
 
 	ros::ServiceClient set_mode_client = td.serviceClient<mavros_msgs::SetMode>
 			("mavros/set_mode");
@@ -78,131 +78,131 @@ int main(int argc, char **argv)
 	//the setpoint publishing rate MUST be faster than 2Hz
 	ros::Rate loop_rate(rate);
 
-    visualization_msgs::Marker points, line_strip;
-    points.header.frame_id = line_strip.header.frame_id = "map";
-    points.header.stamp = line_strip.header.stamp = ros::Time::now();
-    points.ns = line_strip.ns = "points_and_lines";
-    points.action = line_strip.action = visualization_msgs::Marker::ADD;
-    points.id = 0;
-    line_strip.id = 1;
-    points.type = visualization_msgs::Marker::SPHERE_LIST;         // POINTS, SPHERE_LIST
-    line_strip.type = visualization_msgs::Marker::LINE_STRIP;
-    points.pose.orientation.w = line_strip.pose.orientation.w = 1.0;
+	visualization_msgs::Marker points, line_strip;
+	points.header.frame_id = line_strip.header.frame_id = "map";
+	points.header.stamp = line_strip.header.stamp = ros::Time::now();
+	points.ns = line_strip.ns = "points_and_lines";
+	points.action = line_strip.action = visualization_msgs::Marker::ADD;
+	points.id = 0;
+	line_strip.id = 1;
+	points.type = visualization_msgs::Marker::SPHERE_LIST;         // POINTS, SPHERE_LIST
+	line_strip.type = visualization_msgs::Marker::LINE_STRIP;
+	points.pose.orientation.w = line_strip.pose.orientation.w = 1.0;
 
-    // POINTS markers use x and y scale for width/height respectively
-    points.scale.x = 0.05;         // 0.05, 0.1
-    points.scale.y = 0.05;
-    points.scale.z = 0.05;
+	// POINTS markers use x and y scale for width/height respectively
+	points.scale.x = 0.05;         // 0.05, 0.1
+	points.scale.y = 0.05;
+	points.scale.z = 0.05;
 
-    line_strip.scale.x = 0.03;
-    line_strip.scale.x = 0.03;
-    line_strip.scale.x = 0.03;
+	line_strip.scale.x = 0.03;
+	line_strip.scale.x = 0.03;
+	line_strip.scale.x = 0.03;
 
-    // Points are green
-    points.color.g = 1.0f;
-    points.color.a = 1.0;
+	// Points are green
+	points.color.g = 1.0f;
+	points.color.a = 1.0;
 
-    // Line strip is blue
-    line_strip.color.r = 1.0;
-    line_strip.color.a = 1.0;
+	// Line strip is blue
+	line_strip.color.r = 1.0;
+	line_strip.color.a = 1.0;
 
-    // wait for FCU connection
-    ROS_INFO("Waiting for FCU connection .");
-    while(ros::ok() && current_state.connected){
-        //ROS_INFO_ONCE("Waiting for FCU connection ...");
-    	std::cout << ".";
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
-    ROS_INFO("FCU connected");
+	// wait for FCU connection
+	ROS_INFO("Waiting for FCU connection .");
+	while(ros::ok() && current_state.connected){
+        	//ROS_INFO_ONCE("Waiting for FCU connection ...");
+	    	std::cout << ".";
+	        ros::spinOnce();
+        	loop_rate.sleep();
+	}
+	ROS_INFO("FCU connected");
 
-    // check current pose
-    float batt_percent;
-    for(int i = 100; ros::ok() && i > 0; --i){
-    	ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+	// check current pose
+	float batt_percent;
+	for(int i = 100; ros::ok() && i > 0; --i){
+    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
 
-    	float batt_percent = current_batt.percentage * 100;
-    	ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+    		float batt_percent = current_batt.percentage * 100;
+    		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+	        ros::spinOnce();
+        	loop_rate.sleep();
+	}
 
-    mavros_msgs::SetMode offb_set_mode;
+	mavros_msgs::SetMode offb_set_mode;
 
-    ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
-    char a[100];
+	ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
+	char a[100];
 	int count = 0;
-    std::cin >> a;
-    while (1)
-    {
-    	if (count > 10)
-    		ros::shutdown();
+	std::cin >> a;
+	while (1)
+	{
+    		if (count > 10)
+    			ros::shutdown();
 
-    	if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
-    		break;
-    	else
-    	{
-    		ROS_WARN("Can you retype your choice ?");
-    	    ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
-    	    std::cin >> a;
-    	}
-    	count++;
-    }
+	    	if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
+    			break;
+	    	else
+    		{
+    			ROS_WARN("Can you retype your choice ?");
+			ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
+			std::cin >> a;
+	    	}
+    		count++;
+	}
 
-    Eigen::Vector3d value_A;
-    pose_A.pose.position.x = current_pose.pose.position.x;
-    pose_A.pose.position.y = current_pose.pose.position.y;
-    pose_A.pose.position.z = current_pose.pose.position.z + 3;
-    tf::pointMsgToEigen(pose_A.pose.position, value_A);
-    //send a few setpoints before starting
-    for(int i = 100; ros::ok() && i > 0; --i){
-    	pose_A.header.stamp = ros::Time::now();
-    	local_pos_sp_pub.publish(pose_A);
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+	Eigen::Vector3d value_A;
+	pose_A.pose.position.x = current_pose.pose.position.x;
+	pose_A.pose.position.y = current_pose.pose.position.y;
+	pose_A.pose.position.z = current_pose.pose.position.z + 3;
+	tf::pointMsgToEigen(pose_A.pose.position, value_A);
+	//send a few setpoints before starting
+	for(int i = 100; ros::ok() && i > 0; --i){
+    		pose_A.header.stamp = ros::Time::now();
+    		local_pos_sp_pub.publish(pose_A);
+        	ros::spinOnce();
+	        loop_rate.sleep();
+	}
 
-    ROS_INFO("Ready");
-    ros::Duration(3).sleep();
+	ROS_INFO("Ready");
+	ros::Duration(3).sleep();
 
-    // publish target, keep drone hovering
-    int mode = 1;
+	// publish target, keep drone hovering
+	int mode = 1;
 
 	uint8_t pos_target = 1;
 
 	ROS_INFO("Testing...");
 	double origin;
 	while (ros::ok()) {
-    	switch(mode)
-    	{
-    	case 1:
-    		points.points.push_back(current_pose.pose.position);
-	        line_strip.points.push_back(current_pose.pose.position);
-	        marker_pub.publish(points);
-	        marker_pub.publish(line_strip);
-
-    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
-    		batt_percent = current_batt.percentage * 100;
-    		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
-
-    		local_pos_sp_pub.publish(pose_A);
-    		loop_rate.sleep();
-    		ros::spinOnce();
-
-    		if( position_distance(current_pose, pose_A) == true)
+    		switch(mode)
     		{
-    		   	ROS_WARN("Use PID velocity to fly from A to B");
-    		    mode = 2;
-    		}
-    		break;
-    	case 2:
-			// motion routine
-    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
-    		points.points.push_back(current_pose.pose.position);
-	        line_strip.points.push_back(current_pose.pose.position);
-	        marker_pub.publish(points);
-	        marker_pub.publish(line_strip);
+    		case 1:
+    			points.points.push_back(current_pose.pose.position);
+		        line_strip.points.push_back(current_pose.pose.position);
+		        marker_pub.publish(points);
+	        	marker_pub.publish(line_strip);
+
+	    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+    			batt_percent = current_batt.percentage * 100;
+    			ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+
+	    		local_pos_sp_pub.publish(pose_A);
+    			loop_rate.sleep();
+    			ros::spinOnce();
+
+	    		if( position_distance(current_pose, pose_A) == true)
+    			{
+    			   	ROS_WARN("Use PID velocity to fly from A to B");
+				mode = 2;
+	    		}
+    			break;
+	    	case 2:
+	    		// motion routine
+    			ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+    			points.points.push_back(current_pose.pose.position);
+		        line_strip.points.push_back(current_pose.pose.position);
+		        marker_pub.publish(points);
+	        	marker_pub.publish(line_strip);
 
 			switch (pos_target) {
 			case 1:
@@ -232,13 +232,10 @@ int main(int argc, char **argv)
 			// Defines the accepted threshold to the destination/target position before moving to the next setpoint.
 			//
 			while (!stop) {
-	    		points.points.push_back(current_pose.pose.position);
-		        line_strip.points.push_back(current_pose.pose.position);
-		        marker_pub.publish(points);
-		        marker_pub.publish(line_strip);
-
-				loop_rate.sleep();
-				ros::spinOnce();
+				points.points.push_back(current_pose.pose.position);
+				line_strip.points.push_back(current_pose.pose.position);
+				marker_pub.publish(points);
+				marker_pub.publish(line_strip);
 
 				tf::pointMsgToEigen(ps.pose.position, dest);
 				tf::pointMsgToEigen(current_pose.pose.position, current);
@@ -257,6 +254,8 @@ int main(int argc, char **argv)
 				tf::vectorEigenToMsg(compute_linvel_effort(dest, current, last_time), vs.twist.linear);
 
 				vel_sp_pub.publish(vs);
+				loop_rate.sleep();
+				ros::spinOnce();
 
 				last_time = ros::Time::now();
 			}
@@ -274,7 +273,7 @@ int main(int argc, char **argv)
 			else
 				++pos_target;
 			break;
-    	}
+	    	}
 		if (pos_target == 7)
 			break;
 	}
