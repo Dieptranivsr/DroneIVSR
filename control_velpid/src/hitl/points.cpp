@@ -195,11 +195,12 @@ int main( int argc, char **argv)
     	switch(mode)
     	{
     	case 1:
-    		//ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
     		batt_percent = current_batt.percentage * 100;
     		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
     		local_pos_sp_pub.publish(pose_A);
+    		loop_rate.sleep();
+    		ros::spinOnce();
 
     		if(_position_distance(current_pose, pose_A) < 0.2)
     		{
@@ -218,6 +219,8 @@ int main( int argc, char **argv)
 
     		_last_time = ros::Time::now();
         	vel_sp_pub.publish(vel_msg);
+        	loop_rate.sleep();
+        	ros::spinOnce();
         	if (_position_distance(current_pose, pose_B) < 0.2)
         		mode = 3;
         	break;
@@ -228,13 +231,13 @@ int main( int argc, char **argv)
     			ROS_INFO("AUTO.LAND enabled");
     			mode = 0;
     		}
+    		
+    		loop_rate.sleep();
+    		ros::spinOnce();
     		break;
     	}
     	if (mode == 0)
     		break;
-    	
-		loop_rate.sleep();
-		ros::spinOnce();
 		
     	points.points.push_back(current_pose.pose.position);
         line_strip.points.push_back(current_pose.pose.position);

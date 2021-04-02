@@ -186,3 +186,8 @@ install(TARGETS control_velpid_lib control_velpid_node square_velpid_node square
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
+
+catkin_install_python(PROGRAMS
+  scripts/getResults.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

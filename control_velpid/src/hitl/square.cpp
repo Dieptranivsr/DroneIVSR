@@ -14,13 +14,10 @@
 #include <mavros_msgs/SetMavFrame.h>
 #include <sensor_msgs/BatteryState.h>
 #include <eigen_conversions/eigen_msg.h>
-#include <sensor_msgs/BatteryState.h>
 #include <visualization_msgs/Marker.h>
 
 #include <control_velpid/velpid_lib.h>
 #include <control_velpid/pid_controller.h>
-
-#include <control_velpid/captureGraph.h>
 
 geometry_msgs::PoseStamped pose_A;
 geometry_msgs::PoseStamped ps;
@@ -161,7 +158,7 @@ int main(int argc, char **argv)
 	Eigen::Vector3d value_A;
 	pose_A.pose.position.x = current_pose.pose.position.x;
 	pose_A.pose.position.y = current_pose.pose.position.y;
-	pose_A.pose.position.z = current_pose.pose.position.z + 3;
+	pose_A.pose.position.z = current_pose.pose.position.z + 5;
 	landmark.points.push_back(pose_A.pose.position);
 	marker_pub.publish(landmark);
 
@@ -193,7 +190,7 @@ int main(int argc, char **argv)
 			marker_pub.publish(points);
 			marker_pub.publish(line_strip);
 
-			ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+			std::cout << "\nCurrent position: \n" << current_pose.pose.position << std::endl;
 			batt_percent = current_batt.percentage * 100;
 			ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
@@ -201,7 +198,7 @@ int main(int argc, char **argv)
 			loop_rate.sleep();
 			ros::spinOnce();
 
-			if( position_distance(current_pose, pose_A) == true)
+			if( _position_distance(current_pose, pose_A) < 0.1)
 			{
 				ROS_WARN("Use PID velocity to fly from A to B");
 				mode = 2;
@@ -217,19 +214,19 @@ int main(int argc, char **argv)
 
 			switch (pos_target) {
 			case 1:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 3), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 5), ps.pose.position);
 				break;
 			case 2:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 3, value_A.y() + 3, 3), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 3, value_A.y() + 3, 5), ps.pose.position);
 				break;
 			case 3:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 3, value_A.y() - 3, 3), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() - 3, value_A.y() - 3, 5), ps.pose.position);
 				break;
 			case 4:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() - 3, 3), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() - 3, 5), ps.pose.position);
 				break;
 			case 5:
-				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 3), ps.pose.position);
+				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 5), ps.pose.position);
 				break;
 			default:
 				break;
@@ -254,15 +251,10 @@ int main(int argc, char **argv)
 				tf::pointMsgToEigen(ps.pose.position, dest);
 				tf::pointMsgToEigen(current_pose.pose.position, current);
 
-				ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
 				batt_percent = current_batt.percentage * 100;
 				ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
-				distance = sqrt((dest - current).x() * (dest - current).x() +
-								(dest - current).y() * (dest - current).y() +
-								(dest - current).z() * (dest - current).z());
-				ROS_INFO_STREAM("Distance : " << distance << "(m)");
-				if (distance <= err_th)
+				if (_position_distance(current_pose, ps) <= err_th)
 					stop = true;
 
 				tf::vectorEigenToMsg(compute_linvel_effort(dest, current, last_time), vs.twist.linear);

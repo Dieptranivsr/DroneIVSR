@@ -74,7 +74,7 @@ double _position_distance(geometry_msgs::PoseStamped e1, geometry_msgs::PoseStam
 	Eigen::Vector3d ps1, ps2;
 	tf::pointMsgToEigen(e1.pose.position, ps2);
 	tf::pointMsgToEigen(e2.pose.position, ps1);
-	std::cout << "CURRENT POSE" <<  e1 << std::endl;
+	std::cout << "CURRENT POSE/n" <<  e1 << std::endl;
 
 	double distance = sqrt( (ps2 - ps1).x() * (ps2 - ps1).x() +
 							(ps2 - ps1).y() * (ps2 - ps1).y() +
