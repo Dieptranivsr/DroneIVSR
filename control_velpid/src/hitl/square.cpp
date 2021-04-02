@@ -109,23 +109,23 @@ int main(int argc, char **argv)
 	// wait for FCU connection
 	ROS_INFO("Waiting for FCU connection .");
 	while(ros::ok() && current_state.connected){
-        	//ROS_INFO_ONCE("Waiting for FCU connection ...");
-	    	std::cout << ".";
-	        ros::spinOnce();
-        	loop_rate.sleep();
+		//ROS_INFO_ONCE("Waiting for FCU connection ...");
+		std::cout << ".";
+		ros::spinOnce();
+		loop_rate.sleep();
 	}
 	ROS_INFO("FCU connected");
 
 	// check current pose
 	float batt_percent;
 	for(int i = 100; ros::ok() && i > 0; --i){
-    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
 
-    		float batt_percent = current_batt.percentage * 100;
-    		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+		float batt_percent = current_batt.percentage * 100;
+		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
-	        ros::spinOnce();
-        	loop_rate.sleep();
+		ros::spinOnce();
+		loop_rate.sleep();
 	}
 
 	mavros_msgs::SetMode offb_set_mode;
@@ -134,20 +134,18 @@ int main(int argc, char **argv)
 	char a[100];
 	int count = 0;
 	std::cin >> a;
-	while (1)
+	while (	++count)
 	{
-    		if (count > 10)
-    			ros::shutdown();
-
-	    	if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
-    			break;
-	    	else
-    		{
-    			ROS_WARN("Can you retype your choice ?");
+		if (count > 10)
+			ros::shutdown();
+		if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
+			break;
+		else
+		{
+			ROS_WARN("Can you retype your choice ?");
 			ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
 			std::cin >> a;
-	    	}
-    		count++;
+		}
 	}
 
 	Eigen::Vector3d value_A;
@@ -157,10 +155,10 @@ int main(int argc, char **argv)
 	tf::pointMsgToEigen(pose_A.pose.position, value_A);
 	//send a few setpoints before starting
 	for(int i = 100; ros::ok() && i > 0; --i){
-    		pose_A.header.stamp = ros::Time::now();
-    		local_pos_sp_pub.publish(pose_A);
-        	ros::spinOnce();
-	        loop_rate.sleep();
+		pose_A.header.stamp = ros::Time::now();
+		local_pos_sp_pub.publish(pose_A);
+		ros::spinOnce();
+		loop_rate.sleep();
 	}
 
 	ROS_INFO("Ready");
@@ -174,35 +172,35 @@ int main(int argc, char **argv)
 	ROS_INFO("Testing...");
 	double origin;
 	while (ros::ok()) {
-    		switch(mode)
-    		{
-    		case 1:
-    			points.points.push_back(current_pose.pose.position);
-		        line_strip.points.push_back(current_pose.pose.position);
-		        marker_pub.publish(points);
-	        	marker_pub.publish(line_strip);
+		switch(mode)
+		{
+		case 1:
+			points.points.push_back(current_pose.pose.position);
+			line_strip.points.push_back(current_pose.pose.position);
+			marker_pub.publish(points);
+			marker_pub.publish(line_strip);
 
-	    		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
-    			batt_percent = current_batt.percentage * 100;
-    			ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+			ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+			batt_percent = current_batt.percentage * 100;
+			ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
-	    		local_pos_sp_pub.publish(pose_A);
-    			loop_rate.sleep();
-    			ros::spinOnce();
+			local_pos_sp_pub.publish(pose_A);
+			loop_rate.sleep();
+			ros::spinOnce();
 
-	    		if( position_distance(current_pose, pose_A) == true)
-    			{
-    			   	ROS_WARN("Use PID velocity to fly from A to B");
+			if( position_distance(current_pose, pose_A) == true)
+			{
+				ROS_WARN("Use PID velocity to fly from A to B");
 				mode = 2;
-	    		}
-    			break;
-	    	case 2:
-	    		// motion routine
-    			ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
-    			points.points.push_back(current_pose.pose.position);
-		        line_strip.points.push_back(current_pose.pose.position);
-		        marker_pub.publish(points);
-	        	marker_pub.publish(line_strip);
+			}
+			break;
+		case 2:
+			// motion routine
+			ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+			points.points.push_back(current_pose.pose.position);
+			line_strip.points.push_back(current_pose.pose.position);
+			marker_pub.publish(points);
+			marker_pub.publish(line_strip);
 
 			switch (pos_target) {
 			case 1:
