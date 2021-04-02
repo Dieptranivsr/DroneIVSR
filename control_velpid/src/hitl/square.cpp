@@ -228,9 +228,19 @@ int main(int argc, char **argv)
 			case 5:
 				tf::pointEigenToMsg(pos_setpoint(value_A.x() + 3, value_A.y() + 3, 5), ps.pose.position);
 				break;
+			case 6:
+				ROS_INFO("Test complete!");
+				ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
+				offb_set_mode.request.custom_mode = "AUTO.LAND";
+				if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
+					ROS_INFO("AUTO.LAND enabled");
+				break;
 			default:
 				break;
 			}
+
+			if (pos_target == 7)
+				break;
 
 			landmark.points.push_back(pose_A.pose.position);
 			marker_pub.publish(landmark);
@@ -265,21 +275,10 @@ int main(int argc, char **argv)
 
 				last_time = ros::Time::now();
 			}
-
-			if (pos_target == 6) {
-				ROS_INFO("Test complete!");
-				ROS_INFO("Travel real time: %6.6f (s)", ros::Time::now().toSec() - origin);
-
-				offb_set_mode.request.custom_mode = "AUTO.LAND";
-				if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
-					ROS_INFO("AUTO.LAND enabled");
-
-				++pos_target;
-			}
-			else
-				++pos_target;
+			++pos_target;
 			break;
-	    	}
+	    }
+
 		if (pos_target == 7)
 			break;
 	}
