@@ -64,8 +64,8 @@ int main(int argc, char **argv)
 	double rate = 20.0;
 
 	double linvel_p_gain = 0.4;
-	double linvel_i_gain = 0.2;
-	double linvel_d_gain = 0.4;
+	double linvel_i_gain = 0.05;
+	double linvel_d_gain = 0.12;
 	double linvel_i_max = 1.1;
 	double linvel_i_min = -1.1;
 
