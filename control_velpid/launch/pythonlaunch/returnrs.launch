@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="control_velpid" name="getResults" type="getResults.py" output="screen"/>
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find control_velpid)/rviz/maker_points.rviz" />
+</launch>

@@ -20,7 +20,7 @@
 #include <control_velpid/pid_controller.h>
 
 Eigen::Vector3d velocity;
-float batt_percent, err_th = 0.2;
+float batt_percent;
 
 geometry_msgs::TwistStamped data_vel;
 void vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg)
@@ -165,59 +165,90 @@ int main( int argc, char **argv)
     ros::Time last_time = ros::Time::now();
     Eigen::Vector3d dest;
     Eigen::Vector3d current;
-    bool stop = false;
+    int target = 1, mode = 1;
+    bool stop;
 
-    while( ros::ok() && !stop)
+    while( ros::ok())
     {
-    	local_pos_sp_pub.publish(pose_A);
-    	loop_rate.sleep();
-    	ros::spinOnce();
-    	if (_position_distance(current_pose, pose_A) < err_th)
-    		stop = true;
-
-        batt_percent = current_batt.percentage * 100;
-        ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
-
-    	points.points.push_back(current_pose.pose.position);
-    	line_strip.points.push_back(current_pose.pose.position);
-    	marker_pub.publish(points);
-    	marker_pub.publish(line_strip);
-    }
-
-    pose_B.pose.position.x = value_A.x() + 7;
-    pose_B.pose.position.y = value_A.y();
-    pose_B.pose.position.z = value_A.z();
-
-    landmark.points.push_back(pose_B.pose.position);
-    marker_pub.publish(landmark);
-    ros::spinOnce();
-    loop_rate.sleep();
-
-    last_time = ros::Time::now();
-    stop = false;
-
-    while( ros::ok() && !stop)
-    {
-    	tf::pointMsgToEigen(pose_B.pose.position, dest);
-    	tf::pointMsgToEigen(current_pose.pose.position, current);
-
-    	tf::vectorEigenToMsg(compute_linvel_effort(dest, current, last_time), vel_msg.twist.linear);
-    	vel_sp_pub.publish(vel_msg);
-    	last_time = ros::Time::now();
-    	ros::spinOnce();
-    	loop_rate.sleep();
-
-    	if (_position_distance(current_pose, pose_B) < err_th )
-    		stop = true;
-
     	batt_percent = current_batt.percentage * 100;
     	ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
-    	points.points.push_back(current_pose.pose.position);
-    	line_strip.points.push_back(current_pose.pose.position);
-    	marker_pub.publish(points);
-    	marker_pub.publish(line_strip);
+    	while( ros::ok() && mode == 1)
+    	{
+    		points.points.push_back(current_pose.pose.position);
+    		line_strip.points.push_back(current_pose.pose.position);
+    		marker_pub.publish(points);
+    		marker_pub.publish(line_strip);
 
+    		local_pos_sp_pub.publish(pose_A);
+    		loop_rate.sleep();
+    		ros::spinOnce();
+    		if (_position_distance(current_pose, pose_A) < 0.15)
+    		{
+    			mode = 2;
+    		}
+    	}
+
+    	switch(target)
+    	{
+    	case 1:
+    		pose_B.pose.position.x = value_A.x() + 3;
+    		pose_B.pose.position.y = value_A.y() + 3;
+    		pose_B.pose.position.z = value_A.z();
+    		break;
+    	case 2:
+    		pose_B.pose.position.x = value_A.x() - 3;
+    		pose_B.pose.position.y = value_A.y() + 3;
+    		pose_B.pose.position.z = value_A.z();
+    		break;
+    	case 3:
+    		pose_B.pose.position.x = value_A.x() - 3;
+    		pose_B.pose.position.y = value_A.y() - 3;
+    		pose_B.pose.position.z = value_A.z();
+    		break;
+    	case 4:
+    		pose_B.pose.position.x = value_A.x() + 3;
+    		pose_B.pose.position.y = value_A.y() - 3;
+    		pose_B.pose.position.z = value_A.z();
+    		break;
+    	case 5:
+    		pose_B.pose.position.x = value_A.x() + 3;
+    		pose_B.pose.position.y = value_A.y() + 3;
+    		pose_B.pose.position.z = value_A.z();
+    		break;
+    	}
+
+    	landmark.points.push_back(pose_B.pose.position);
+    	marker_pub.publish(landmark);
+    	last_time = ros::Time::now();
+    	stop = false;
+
+    	while( ros::ok() && !stop)
+    	{
+    		batt_percent = current_batt.percentage * 100;
+    		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+
+    		tf::pointMsgToEigen(pose_B.pose.position, dest);
+    		tf::pointMsgToEigen(current_pose.pose.position, current);
+    		points.points.push_back(current_pose.pose.position);
+    		line_strip.points.push_back(current_pose.pose.position);
+    		marker_pub.publish(points);
+    		marker_pub.publish(line_strip);
+
+    		tf::vectorEigenToMsg(compute_linvel_effort(dest, current, last_time), vel_msg.twist.linear);
+    		vel_sp_pub.publish(vel_msg);
+    		last_time = ros::Time::now();
+
+    		ros::spinOnce();
+    		loop_rate.sleep();
+
+    		if (_position_distance(current_pose, pose_B) < 0.1 )
+    			stop = true;
+    	}
+    	++target;
+
+    	if (target == 6)
+    		break;
     }
 
     offb_set_mode.request.custom_mode = "AUTO.LAND";

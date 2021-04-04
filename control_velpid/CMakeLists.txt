@@ -4,9 +4,6 @@ project(control_velpid)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   angles
   eigen_conversions
@@ -31,25 +28,13 @@ if(NOT EIGEN3_FOUND)
   set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
 endif()
 
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
+
 catkin_package(
   #INCLUDE_DIRS include
   #LIBRARIES control_velpid
   CATKIN_DEPENDS angles eigen_conversions geometry_msgs mavros mavros_extras roscpp std_msgs tf2_ros visualization_msgs
   DEPENDS Boost
 )
-
-###########
-## Build ##
-###########
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
@@ -81,7 +66,7 @@ target_link_libraries(
 ## Declare a C++ executable
 add_executable(
   control_velpid_node 
-  src/ctrl_vel.cpp
+  src/origin/ctrl_vel.cpp
 )
 
 add_executable(
@@ -91,34 +76,45 @@ add_executable(
 
 #add_executable(
 #  circle_velpid_node 
-#  src/circle_ctrl_vel.cpp
+#  src/sitl/circle_ctrl_vel.cpp
 #)
 
 add_executable(
   control_v2
-  src/controlv2.cpp
+  src/latest/controlv2.cpp
 )
 
 add_executable(
   control_worldframe
-  src/control_worldframe.cpp
+  src/latest/control_worldframe.cpp
 )
 
 add_executable(
   square_path
-  src/square_path.cpp
+  src/latest/square_path.cpp             # have trajectory
+)
+
+add_executable(
+  square_notrajectory
+  src/latest/one2fourpoints.cpp          # no trajectory
 )
 
 ############ HITL ###############
 add_executable(
-  point2point
+  hitl_point2point
   src/hitl/points.cpp
 )
 
 add_executable(
-  squarepath
+  hitl_squarepath
   src/hitl/square.cpp
 )
+
+add_executable(
+  hitl_squarenotrajectory
+  src/hitl/hitlone2fourpoints.cpp
+)
+
 #################################
 
 add_dependencies(
@@ -128,10 +124,12 @@ add_dependencies(
   control_v2
   control_worldframe
   square_path
+  square_notrajectory
   #circle_velpid_node
   # HITL
-  point2point
-  squarepath
+  hitl_point2point
+  hitl_squarepath
+  hitl_squarenotrajectory
   control_velpid_lib
 )
 
@@ -167,17 +165,28 @@ target_link_libraries(
 )
 
 target_link_libraries(
-  point2point
+  square_notrajectory
+  control_velpid_lib
+)
+
+# HITL
+target_link_libraries(
+  hitl_point2point
   control_velpid_lib
 )
 
 target_link_libraries(
-  squarepath
+  hitl_squarepath
+  control_velpid_lib
+)
+
+target_link_libraries(
+  hitl_squarenotrajectory
   control_velpid_lib
 )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS control_velpid_lib control_velpid_node square_velpid_node square_path control_worldframe point2point squarepath #circle_velpid_node control_v2 
+install(TARGETS control_velpid_lib control_velpid_node square_velpid_node square_path control_worldframe hitl_point2point hitl_squarepath square_notrajectory hitl_squarenotrajectory #circle_velpid_node control_v2 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
@@ -187,7 +196,16 @@ install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
+install(DIRECTORY launch/sitl
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch/sitl
+)
+
+install(DIRECTORY launch/hitl
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch/hitl
+)
+
 catkin_install_python(PROGRAMS
   scripts/getResults.py
+  scripts/getRs2.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

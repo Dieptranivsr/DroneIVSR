@@ -20,7 +20,7 @@
 #include <control_velpid/pid_controller.h>
 
 Eigen::Vector3d velocity;
-float batt_percent, err_th = 0.2;
+float batt_percent, err_th = 0.1;
 
 geometry_msgs::TwistStamped data_vel;
 void vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg)
@@ -58,6 +58,16 @@ int main( int argc, char **argv)
 			("mavros/cmd/arming");
 	ros::ServiceClient set_mode_client = td.serviceClient<mavros_msgs::SetMode>
 			("mavros/set_mode");
+
+	//ros::Publisher pub_vel_x = td.advertise<std_msgs::Float64>("/velocity/x",10);
+	//ros::Publisher pub_vel_y = td.advertise<std_msgs::Float64>("/velocity/y",10);
+	//ros::Publisher pub_vel_z = td.advertise<std_msgs::Float64>("/velocity/z",10);
+
+	//std_msgs::Float64 vel_x;
+	//std_msgs::Float64 vel_y;
+	//std_msgs::Float64 vel_z;
+
+	// threshold = threshold_definition();
 
 	// the setpoint publishing rate MUST be faster than 2Hz
 	int rate = 20;
@@ -108,59 +118,74 @@ int main( int argc, char **argv)
     landmark.color.r = 1.0;
     landmark.color.a = 1.0;
 
-	// wait for FCU connection
-	ROS_INFO("Waiting for FCU connection .");
-	while(ros::ok() && current_state.connected){
-		std::cout << ". ";
-		ros::spinOnce();
-		loop_rate.sleep();
-	}
-	ROS_INFO("FCU connected");
+    // wait for FCU connection
+    while(ros::ok() && !current_state.connected){
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 
-	// check current pose
-	float batt_percent;
-	for(int i = 100; ros::ok() && i > 0; --i){
-		ROS_INFO_STREAM("\nCurrent position: \n" << current_pose.pose.position);
+    //Eigen::Vector4d pose_goal(0, 5.0, 3, -91*M_PI/180);   (0,5,5)
+    //Eigen::Vector4d pose_goal(0, -5.0, 12, -91*M_PI/180);
 
-		float batt_percent = current_batt.percentage * 100;
-		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+    geometry_msgs::PoseStamped pose_A;
+    pose_A.pose.position.x = 0;
+    pose_A.pose.position.y = 0;
+    pose_A.pose.position.z = 5;
+    Eigen::Vector3d value_A;
+    tf::pointMsgToEigen(pose_A.pose.position, value_A);
 
-		ros::spinOnce();
-		loop_rate.sleep();
-	}
+    geometry_msgs::PoseStamped pose_B;
+    //pose_B.pose.position.x = pose_goal(0);
+    //pose_B.pose.position.y = pose_goal(1);
+    //pose_B.pose.position.z = pose_goal(2);
 
-	mavros_msgs::SetMode offb_set_mode;
-	geometry_msgs::PoseStamped pose_A;
-	geometry_msgs::PoseStamped pose_B;
-	geometry_msgs::TwistStamped vel_msg;
+    geometry_msgs::TwistStamped vel_msg;
 
-	Eigen::Vector3d value_A;
-	pose_A.pose.position.x = current_pose.pose.position.x;
-	pose_A.pose.position.y = current_pose.pose.position.y;
-	pose_A.pose.position.z = current_pose.pose.position.z + 5;
-	landmark.points.push_back(pose_A.pose.position);
-	marker_pub.publish(landmark);
-	tf::pointMsgToEigen(pose_A.pose.position, value_A);
+    //send a few setpoints before starting
+    for(int i = 100; ros::ok() && i > 0; --i){
+    	local_pos_sp_pub.publish(pose_A);
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 
-	ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
-	char a[100];
-	int count = 0;
-	std::cin >> a;
-	while (1)
-	{
-		if (count > 10)
-			ros::shutdown();
+    mavros_msgs::SetMode offb_set_mode;
+    offb_set_mode.request.custom_mode = "OFFBOARD";
+    mavros_msgs::CommandBool arm_cmd;
+    arm_cmd.request.value = true;
 
-		if (strcmp(a, "y") == 0||strcmp(a, "Y") == 0)
-			break;
-		else
-		{
-			ROS_WARN("Can you retype your choice ?");
-			ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
-			std::cin >> a;
-		}
-		count++;
-	}
+    landmark.points.push_back(pose_A.pose.position);
+    marker_pub.publish(landmark);
+
+    ros::Time last_request = ros::Time::now();
+    while(ros::ok()){
+        if( current_state.mode != "OFFBOARD" &&
+            (ros::Time::now() - last_request > ros::Duration(5.0))){
+            if( set_mode_client.call(offb_set_mode) &&
+                offb_set_mode.response.mode_sent){
+                ROS_INFO("Offboard enabled");
+            }
+            last_request = ros::Time::now();
+        } else {
+            if( !current_state.armed &&
+                (ros::Time::now() - last_request > ros::Duration(5.0))){
+                if( arming_client.call(arm_cmd) &&
+                    arm_cmd.response.success){
+                    ROS_INFO("Vehicle armed");
+                }
+                last_request = ros::Time::now();
+            }
+        }
+        if (_position_distance(current_pose, pose_A) < 1)
+        	break;
+        points.points.push_back(current_pose.pose.position);
+        line_strip.points.push_back(current_pose.pose.position);
+        marker_pub.publish(points);
+        marker_pub.publish(line_strip);
+
+        local_pos_sp_pub.publish(pose_A);
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 
     ros::Time last_time = ros::Time::now();
     Eigen::Vector3d dest;
