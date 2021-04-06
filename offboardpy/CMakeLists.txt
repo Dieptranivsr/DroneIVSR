@@ -34,12 +34,13 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/commander.py
-  scripts/mavros_run.py
-  scripts/offb_node.py
-  scripts/fly_circle.py
+  scripts/pythongaas/commander.py
+  scripts/pythongaas/mavros_run.py
+  scripts/pythongaas/fly_circle.py
+  # SITL
+  scripts/sitl/offb_node.py
   # HITL
-  scripts/hitl_offb.py
+  scripts/hitl/hitl_offb.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
