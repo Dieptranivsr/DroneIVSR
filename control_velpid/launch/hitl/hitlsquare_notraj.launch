@@ -1,5 +1,5 @@
 <launch>
     <node name="hitl_squarenotrajectory" pkg="control_velpid" type="hitl_squarenotrajectory" output="screen">
     </node>
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find control_velpid)/rviz/maker_points.rviz" />
+    <!--<node type="rviz" name="rviz" pkg="rviz" args="-d $(find control_velpid)/rviz/maker_points.rviz" />-->
 </launch>

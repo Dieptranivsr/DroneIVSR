@@ -100,7 +100,6 @@ Eigen::Vector3d circle_shape(int angle){
 	return Eigen::Vector3d(r * cos(angles::from_degrees(angle)), r * sin(angles::from_degrees(angle)), 1.0f);
 }
 
-
 // Defines Gerono lemniscate path
 Eigen::Vector3d eight_shape(int angle){
 	// Give possibility to user define amplitude of movement (vertical tangent size)

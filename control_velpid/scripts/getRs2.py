@@ -79,7 +79,7 @@ def getResultVel():
     rospy.loginfo("Complete get data from bag file")
     '''
     plt.legend( prop={'size': 20})
-    plt.xlabel('Time (s)', fontsize=24)
+    plt.xlabel('Time ', fontsize=24)
     plt.ylabel('Velocity (m/s)', fontsize=24)
     plt.grid(True)
     title = "PID Velocity Estimated  and Local Position Velocity"
