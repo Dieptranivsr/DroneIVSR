@@ -20,7 +20,7 @@
 #include <control_velpid/pid_controller.h>
 
 Eigen::Vector3d velocity;
-float batt_percent;
+float batt_percent, err_th = 0.2;
 
 geometry_msgs::TwistStamped data_vel;
 void vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg)
@@ -64,9 +64,9 @@ int main( int argc, char **argv)
 	ros::Rate loop_rate(rate);
 
 	double linvel_p_gain = 0.4;         //1.4, 0.8
-	double linvel_i_gain = 0.05;        //-------- 0,1           0.2
+	double linvel_i_gain = 0.00;        //-------- 0,1           0.2  #0.05
 	double linvel_d_gain = 0.12;        //------------ 0.24, 0.2 0.4
-	double linvel_i_max = 0.1;
+	double linvel_i_max = 0.12;
 	double linvel_i_min = -0.1;
 	setup_livel_pid(linvel_p_gain, linvel_i_gain, linvel_d_gain, linvel_i_max, linvel_i_min);
 
@@ -142,7 +142,7 @@ int main( int argc, char **argv)
 	marker_pub.publish(landmark);
 	tf::pointMsgToEigen(pose_A.pose.position, value_A);
 
-	ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
+	ROS_INFO_STREAM("Do you fly (using PID) ? (y/n)");
 	char a[100];
 	int count = 0;
 	std::cin >> a;
@@ -156,7 +156,7 @@ int main( int argc, char **argv)
 		else
 		{
 			ROS_WARN("Can you retype your choice ?");
-			ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
+			ROS_INFO_STREAM("Do you fly (using PID) ? (y/n)");
 			std::cin >> a;
 		}
 		count++;
@@ -183,7 +183,7 @@ int main( int argc, char **argv)
     		local_pos_sp_pub.publish(pose_A);
     		loop_rate.sleep();
     		ros::spinOnce();
-    		if (_position_distance(current_pose, pose_A) < 0.15)
+    		if (_position_distance(current_pose, pose_A) < err_th)
     		{
     			mode = 2;
     		}
@@ -242,7 +242,7 @@ int main( int argc, char **argv)
     		ros::spinOnce();
     		loop_rate.sleep();
 
-    		if (_position_distance(current_pose, pose_B) < 0.1 )
+    		if (_position_distance(current_pose, pose_B) < err_th )
     			stop = true;
     	}
     	++target;

@@ -64,9 +64,9 @@ int main( int argc, char **argv)
 	ros::Rate loop_rate(rate);
 
 	double linvel_p_gain = 0.4;         //1.4, 0.8
-	double linvel_i_gain = 0.05;        //-------- 0,1           0.2
+	double linvel_i_gain = 0.00;        //-------- 0,1           0.2   #0.05
 	double linvel_d_gain = 0.12;        //------------ 0.24, 0.2 0.4
-	double linvel_i_max = 0.1;
+	double linvel_i_max = 0.12;
 	double linvel_i_min = -0.1;
 	setup_livel_pid(linvel_p_gain, linvel_i_gain, linvel_d_gain, linvel_i_max, linvel_i_min);
 
@@ -142,7 +142,7 @@ int main( int argc, char **argv)
 	marker_pub.publish(landmark);
 	tf::pointMsgToEigen(pose_A.pose.position, value_A);
 
-	ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
+	ROS_INFO_STREAM("Do you fly (using PID) ? (y/n)");
 	char a[100];
 	int count = 0;
 	std::cin >> a;
@@ -156,7 +156,7 @@ int main( int argc, char **argv)
 		else
 		{
 			ROS_WARN("Can you retype your choice ?");
-			ROS_INFO_STREAM("Are you run by PID - SQUARE ? (y/n)");
+			ROS_INFO_STREAM("Do you fly (using PID) ? (y/n)");
 			std::cin >> a;
 		}
 		count++;
@@ -184,7 +184,7 @@ int main( int argc, char **argv)
     	marker_pub.publish(line_strip);
     }
 
-    pose_B.pose.position.x = value_A.x() + 7;
+    pose_B.pose.position.x = value_A.x() + 10;
     pose_B.pose.position.y = value_A.y();
     pose_B.pose.position.z = value_A.z();
 
