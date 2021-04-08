@@ -20,7 +20,7 @@
 #include <control_velpid/pid_controller.h>
 
 Eigen::Vector3d velocity;
-float batt_percent, err_th = 0.2;
+float batt_percent, err_th = 0.1;
 
 geometry_msgs::TwistStamped data_vel;
 void vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg)
@@ -59,14 +59,24 @@ int main( int argc, char **argv)
 	ros::ServiceClient set_mode_client = td.serviceClient<mavros_msgs::SetMode>
 			("mavros/set_mode");
 
+	//ros::Publisher pub_vel_x = td.advertise<std_msgs::Float64>("/velocity/x",10);
+	//ros::Publisher pub_vel_y = td.advertise<std_msgs::Float64>("/velocity/y",10);
+	//ros::Publisher pub_vel_z = td.advertise<std_msgs::Float64>("/velocity/z",10);
+
+	//std_msgs::Float64 vel_x;
+	//std_msgs::Float64 vel_y;
+	//std_msgs::Float64 vel_z;
+
+	// threshold = threshold_definition();
+
 	// the setpoint publishing rate MUST be faster than 2Hz
 	int rate = 20;
 	ros::Rate loop_rate(rate);
 
 	double linvel_p_gain = 0.4;         //1.4, 0.8
-	double linvel_i_gain = 0.00;        //-------- 0,1           0.2   #0.05
+	double linvel_i_gain = 0.05;        //-------- 0,1           0.2
 	double linvel_d_gain = 0.12;        //------------ 0.24, 0.2 0.4
-	double linvel_i_max = 0.12;
+	double linvel_i_max = 0.1;
 	double linvel_i_min = -0.1;
 	setup_livel_pid(linvel_p_gain, linvel_i_gain, linvel_d_gain, linvel_i_max, linvel_i_min);
 
@@ -111,7 +121,7 @@ int main( int argc, char **argv)
 	// wait for FCU connection
 	ROS_INFO("Waiting for FCU connection .");
 	while(ros::ok() && current_state.connected){
-		std::cout << ". ";
+		//std::cout << ". ";
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
