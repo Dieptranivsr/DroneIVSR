@@ -192,28 +192,33 @@ int main( int argc, char **argv)
     	switch(target)
     	{
     	case 1:
-    		pose_B.pose.position.x = value_A.x() + 3;
-    		pose_B.pose.position.y = value_A.y() + 3;
+    		pose_B.pose.position.x = value_A.x() + 4;
+    		pose_B.pose.position.y = value_A.y() + 4;
     		pose_B.pose.position.z = value_A.z();
     		break;
     	case 2:
-    		pose_B.pose.position.x = value_A.x() - 3;
-    		pose_B.pose.position.y = value_A.y() + 3;
+    		pose_B.pose.position.x = value_A.x() - 4;
+    		pose_B.pose.position.y = value_A.y() + 4;
     		pose_B.pose.position.z = value_A.z();
     		break;
     	case 3:
-    		pose_B.pose.position.x = value_A.x() - 3;
-    		pose_B.pose.position.y = value_A.y() - 3;
+    		pose_B.pose.position.x = value_A.x() - 4;
+    		pose_B.pose.position.y = value_A.y() - 4;
     		pose_B.pose.position.z = value_A.z();
     		break;
     	case 4:
-    		pose_B.pose.position.x = value_A.x() + 3;
+    		pose_B.pose.position.x = value_A.x() + 4;
     		pose_B.pose.position.y = value_A.y() - 3;
     		pose_B.pose.position.z = value_A.z();
     		break;
     	case 5:
-    		pose_B.pose.position.x = value_A.x() + 3;
-    		pose_B.pose.position.y = value_A.y() + 3;
+    		pose_B.pose.position.x = value_A.x() + 4;
+    		pose_B.pose.position.y = value_A.y() + 4;
+    		pose_B.pose.position.z = value_A.z();
+    		break;
+    	case 6:
+    		pose_B.pose.position.x = value_A.x();
+    		pose_B.pose.position.y = value_A.y();
     		pose_B.pose.position.z = value_A.z();
     		break;
     	}
@@ -247,7 +252,7 @@ int main( int argc, char **argv)
     	}
     	++target;
 
-    	if (target == 6)
+    	if (target == 7)
     		break;
     }
 

@@ -184,7 +184,7 @@ int main( int argc, char **argv)
     	marker_pub.publish(line_strip);
     }
 
-    pose_B.pose.position.x = value_A.x() + 10;
+    pose_B.pose.position.x = value_A.x() + 40;
     pose_B.pose.position.y = value_A.y();
     pose_B.pose.position.z = value_A.z();
 

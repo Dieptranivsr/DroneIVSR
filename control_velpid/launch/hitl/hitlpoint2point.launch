@@ -1,5 +1,5 @@
 <launch>
-    <node name="point2point" pkg="control_velpid" type="point2point" output="screen">
+    <node name="hitl_point2point" pkg="control_velpid" type="hitl_point2point" output="screen">
     </node>
     <!--<node type="rviz" name="rviz" pkg="rviz" args="-d $(find control_velpid)/rviz/maker_points.rviz" />-->
 </launch>
