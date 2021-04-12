@@ -26,5 +26,6 @@ void battery_cb(const sensor_msgs::BatteryState::ConstPtr& msg)
 // getlocalpose callback
 void getlocalpose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
+	std::cout << "[DESTINATION POSE]" << dest_pose << std::endl;
 	dest_pose = *msg;
 }

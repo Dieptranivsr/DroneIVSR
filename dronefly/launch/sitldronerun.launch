@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 
-<launch>
-	<remap from="/uav/sending/position_local" to="/drone/get/position_local"/>
-	
+<launch>	
 	<node name="drone_run" pkg="dronefly" type="drone_run" output="screen" args=""/>
 	
-	<node name="takeoff" pkg="dronefly" type="takeoff" output="screen" args=""/>
+	<node name="sitl_takeoff" pkg="dronefly" type="sitl_takeoff" output="screen" args=""/>
 	<node name="markerpoint" pkg="dronefly" type="markerpoint" output="screen" args=""/>
 	
 	<!--<node type="rviz" name="rviz" pkg="rviz" args="-d $(find dronefly)/rviz/maker_points.rviz" />-->
 </launch>
+
+<!--<node name="sendpoint" pkg="dronefly" type="sendpoint.py" output="screen" args=""/>-->

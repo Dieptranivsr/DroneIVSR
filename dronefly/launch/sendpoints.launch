@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+	<node name="sendpoint" pkg="dronefly" type="sendpoint.py" output="screen" args="">
+		<remap from="/uav/sending/position_local" to="/drone/get/position_local"/>
+	</node>
+</launch>

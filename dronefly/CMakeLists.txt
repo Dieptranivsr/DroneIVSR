@@ -79,9 +79,23 @@ add_executable(
   src/maincode/markerpoint.cpp
 )
 
+add_executable(
+  takeoff
+  src/maincode/takeoff.cpp
+)
+
+### SITL
+add_executable(
+  sitl_takeoff
+  src/maincode/sitl_takeoff.cpp
+)
+
 add_dependencies(
   drone_run
   markerpoint
+  takeoff
+  ## SITL
+  sitl_takeoff
   ## lib
   dronefly_lib
 )
@@ -97,8 +111,18 @@ target_link_libraries(
   dronefly_lib
 )
 
+target_link_libraries(
+  takeoff
+  dronefly_lib
+)
+
+target_link_libraries(
+  sitl_takeoff
+  dronefly_lib
+)
+
 ## Mark executables and/or libraries for installation
-install(TARGETS dronefly_lib drone_run markerpoint
+install(TARGETS dronefly_lib drone_run markerpoint takeoff sitl_takeoff
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}

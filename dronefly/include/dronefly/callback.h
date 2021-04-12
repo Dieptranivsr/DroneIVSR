@@ -3,6 +3,9 @@
 #include <sensor_msgs/BatteryState.h>
 #include <geometry_msgs/PoseStamped.h>
 
+// the setpoint publishing rate MUST be faster than 2Hz
+int rate = 20;
+
 /*
  * callbacks
  */

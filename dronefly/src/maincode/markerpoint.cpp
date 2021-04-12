@@ -19,15 +19,15 @@ int main( int argc, char **argv)
 	ros::init(argc, argv, "markerpoints");
 	ros::NodeHandle td;
 
+	ros::Subscriber local_pose_sub = td.subscribe<geometry_msgs::PoseStamped>
+			("/mavros/local_position/pose", 10, local_pos_cb);
 	ros::Subscriber getlocalpose_sub = td.subscribe<geometry_msgs::PoseStamped>
 			("/drone/get/position_local", 10, getlocalpose_cb);
 	ros::Publisher marker_pub = td.advertise<visualization_msgs::Marker>
 			("visualization_marker", 10);
 
 	// the setpoint publishing rate MUST be faster than 2Hz
-	int rate = 20;
 	ros::Rate loop_rate(rate);
-
 
     visualization_msgs::Marker points, line_strip, landmark;
     points.header.frame_id = line_strip.header.frame_id = landmark.header.frame_id = "map";
@@ -74,8 +74,13 @@ int main( int argc, char **argv)
 		marker_pub.publish(points);
 		marker_pub.publish(line_strip);
 
-		landmark.points.push_back(dest_pose.pose.position);
-		marker_pub.publish(dest_pose);
+		if( dest_pose.pose.position.x && dest_pose.pose.position.y && dest_pose.pose.position.z)
+		{
+			landmark.points.push_back(dest_pose.pose.position);
+			marker_pub.publish(dest_pose);
+		}
+		loop_rate.sleep();
+		ros::spinOnce();
 	}
 
 	return 0;

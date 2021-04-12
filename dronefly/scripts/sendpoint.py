@@ -24,22 +24,29 @@ def send_localposition():
     prev_state = current_state
     rate = rospy.Rate(20.0) # MUST be more then 2Hz
 
+    last_request = rospy.get_rostime()
     while not rospy.is_shutdown():
-        if current_state.mode == "OFFBOARD" and current_state.armed:
-            # Update timestamp and publish destination local position
-
-            input_pose = raw_input().split()
-
+        now = rospy.get_rostime()
+        if pose and (now - last_request > rospy.Duration(10.)) :
+            input_pose = raw_input("Enter new position : ").split()
             if input_pose :
-                pose.pose.position.x = input_pose[0]
-                pose.pose.position.y = input_pose[1]
-                pose.pose.position.z = input_pose[2]
-                pose.header.stamp = rospy.Time.now()
-                sending_dest.publish(pose)
+                pose.pose.position.x = int(input_pose[0])
+                pose.pose.position.y = int(input_pose[1])
+                pose.pose.position.z = int(input_pose[2])
+                last_request = rospy.get_rostime()
+            rospy.loginfo("Sending pose")
+            print('[ ' + str(pose.pose.position.x) + ' ' + str(pose.pose.position.y) + ' ' + str(pose.pose.position.z) + ']')
+        pose.header.stamp = rospy.Time.now()
+        sending_dest.publish(pose)
         rate.sleep()
+    rospy.spin()
 
+if __name__ == '__main__':
+    send_localposition()
+'''
 if __name__ == '__main__':
     try:
         send_localposition()
     except rospy.ROSInterruptException:
         pass
+'''

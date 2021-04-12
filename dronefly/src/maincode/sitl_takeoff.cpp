@@ -35,6 +35,8 @@ int main( int argc, char **argv)
 			("/mavros/local_position/pose", 10, local_pos_cb);
 	ros::Subscriber batt_sub = td.subscribe<sensor_msgs::BatteryState>
 			("mavros/battery", 10, battery_cb);
+	ros::Subscriber getlocalpose_sub = td.subscribe<geometry_msgs::PoseStamped>
+			("/drone/get/position_local", 10, getlocalpose_cb);
 
 	ros::Publisher local_pos_sp_pub = td.advertise<geometry_msgs::PoseStamped>
 			("/mavros/setpoint_position/local", 10);
@@ -45,7 +47,6 @@ int main( int argc, char **argv)
 			("mavros/set_mode");
 
 	// the setpoint publishing rate MUST be faster than 2Hz
-	int rate = 20;
 	ros::Rate loop_rate(rate);
 
 	// wait for FCU connection
@@ -75,13 +76,11 @@ int main( int argc, char **argv)
 	pose_A.pose.position.x = current_pose.pose.position.x;
 	pose_A.pose.position.y = current_pose.pose.position.y;
 	pose_A.pose.position.z = current_pose.pose.position.z + 5;
-	tf::pointMsgToEigen(pose_A.pose.position, value_A);
 
 	ROS_INFO_STREAM("Do you fly (using PID) ? (y/n)");
 	char a[100];
-	double err_th = 0.2;
+	double err_th = 0.1;
 	int count = 0;
-	bool stop = false;
 	std::cin >> a;
 	while (1)
 	{
@@ -101,30 +100,27 @@ int main( int argc, char **argv)
 
     while( ros::ok() && !stop)
     {
-    	local_pos_sp_pub.publish(pose_A);
-    	loop_rate.sleep();
-    	ros::spinOnce();
+    	if (!dest_pose.pose.position.x && !dest_pose.pose.position.y && !dest_pose.pose.position.z)
+    	{
+    		local_pos_sp_pub.publish(pose_A);
+    		loop_rate.sleep();
+    		ros::spinOnce();
+    		continue;
+    	}
 
+    	// ros::Time last_request = ros::Time::now();
+    	// if( ros::Time::now() - last_request > ros::Duration(10.0))
     	if (_position_distance(current_pose, pose_A) < err_th)
-    		stop = true;
-
-    	batt_percent = current_batt.percentage * 100;
-    	ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
-    }
-
-	ros::Time last_request = ros::Time::now();
-    while( ros::ok())
-    {
-    	if( ros::Time::now() - last_request > ros::Duration(10.0))
     	{
     		ROS_INFO("[NOTIFICATION] Drone is flying");
     		batt_percent = current_batt.percentage * 100;
     		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
     		std::cout << "[POSITION] CURRENT POSE/n" <<  current_pose << std::endl;
-    		last_request = ros::Time::now();
     	}
+    	batt_percent = current_batt.percentage * 100;
+    	ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
+
     	loop_rate.sleep();
-    	ros::spinOnce();
     }
 
 	return 0;
