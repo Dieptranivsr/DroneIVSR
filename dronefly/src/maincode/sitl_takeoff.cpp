@@ -71,6 +71,7 @@ int main( int argc, char **argv)
 	}
 
 	geometry_msgs::PoseStamped pose_A;
+	ros::Time last_request = ros::Time::now();
 
 	Eigen::Vector3d value_A;
 	pose_A.pose.position.x = current_pose.pose.position.x;
@@ -79,7 +80,6 @@ int main( int argc, char **argv)
 
 	ROS_INFO_STREAM("Do you fly (using PID) ? (y/n)");
 	char a[100];
-	double err_th = 0.1;
 	int count = 0;
 	std::cin >> a;
 	while (1)
@@ -98,7 +98,7 @@ int main( int argc, char **argv)
 		count++;
 	}
 
-    while( ros::ok() && !stop)
+    while( ros::ok())
     {
     	if (!dest_pose.pose.position.x && !dest_pose.pose.position.y && !dest_pose.pose.position.z)
     	{
@@ -110,17 +110,21 @@ int main( int argc, char **argv)
 
     	// ros::Time last_request = ros::Time::now();
     	// if( ros::Time::now() - last_request > ros::Duration(10.0))
-    	if (_position_distance(current_pose, pose_A) < err_th)
+    	if (_position_distance(current_pose, pose_A, false) < err_th)
     	{
-    		ROS_INFO("[NOTIFICATION] Drone is flying");
     		batt_percent = current_batt.percentage * 100;
     		ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
     		std::cout << "[POSITION] CURRENT POSE/n" <<  current_pose << std::endl;
+
+    		if (ros::Time::now() - last_request > ros::Duration(10.0))
+    		{
+    			ROS_INFO("[NOTIFICATION] Drone is flying");
+    			last_request = ros::Time::now();
+    		}
     	}
-    	batt_percent = current_batt.percentage * 100;
-    	ROS_INFO_STREAM("Current Battery: " << batt_percent << "%");
 
     	loop_rate.sleep();
+		ros::spinOnce();
     }
 
 	return 0;

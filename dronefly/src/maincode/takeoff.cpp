@@ -105,7 +105,7 @@ int main( int argc, char **argv)
     	loop_rate.sleep();
     	ros::spinOnce();
 
-    	if (_position_distance(current_pose, pose_A) < err_th)
+    	if (_position_distance(current_pose, pose_A, true) < err_th)
     		stop = true;
 
     	batt_percent = current_batt.percentage * 100;

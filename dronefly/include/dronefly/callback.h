@@ -5,6 +5,7 @@
 
 // the setpoint publishing rate MUST be faster than 2Hz
 int rate = 20;
+float err_th = 0.2;
 
 /*
  * callbacks

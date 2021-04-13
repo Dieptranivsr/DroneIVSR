@@ -66,30 +66,39 @@ int main( int argc, char **argv)
     ros::Time last_time = ros::Time::now();
     geometry_msgs::TwistStamped vel_msg;
     geometry_msgs::PoseStamped goal;
-    float err_th = 0.2;
     Eigen::Vector3d dest;
     Eigen::Vector3d current;
-    int target = 1, mode = 0;
     bool stop;
 
     while( ros::ok())
     {
-    	if (dest_pose!=goal && !stop)
+    	if( dest_pose!=goal && stop)
     	{
     		goal = dest_pose;
-    		stop = false;
+    	}
+
+		stop = false;
+
+		if( !stop)
+		{
     		tf::pointMsgToEigen(goal.pose.position, dest);
     		tf::pointMsgToEigen(current_pose.pose.position, current);
 
     		tf::vectorEigenToMsg(pid.compute_linvel_effort(dest, current, last_time), vel_msg.twist.linear);
     		vel_sp_pub.publish(vel_msg);
     		last_time = ros::Time::now();
-    		ros::spinOnce();
     		loop_rate.sleep();
+    		ros::spinOnce();
 
-    		if (_position_distance(current_pose, goal) < err_th )
+    		if (_position_distance(current_pose, goal, true) < err_th )
+    		{
     			stop = true;
+    			ROS_INFO("Successed !");
+    		}
     	}
+
+    	loop_rate.sleep();
+    	ros::spinOnce();
     }
 
     offb_set_mode.request.custom_mode = "AUTO.LAND";

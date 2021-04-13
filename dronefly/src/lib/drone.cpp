@@ -28,7 +28,7 @@ bool position_distance(geometry_msgs::PoseStamped e1, geometry_msgs::PoseStamped
 	}
 }
 
-double _position_distance(geometry_msgs::PoseStamped e1, geometry_msgs::PoseStamped e2)
+double _position_distance(geometry_msgs::PoseStamped e1, geometry_msgs::PoseStamped e2, bool show)
 {
 	Eigen::Vector3d ps1, ps2;
 	tf::pointMsgToEigen(e1.pose.position, ps2);
@@ -37,7 +37,8 @@ double _position_distance(geometry_msgs::PoseStamped e1, geometry_msgs::PoseStam
 	double distance = sqrt( (ps2 - ps1).x() * (ps2 - ps1).x() +
 							(ps2 - ps1).y() * (ps2 - ps1).y() +
 							(ps2 - ps1).z() * (ps2 - ps1).z());
-	std::cout << "[Distance] : " << distance << std::endl;
+	if( show)
+		std::cout << "[Distance] : " << distance << std::endl;
 
 	return distance;
 }
