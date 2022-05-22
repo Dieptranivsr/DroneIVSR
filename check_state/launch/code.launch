@@ -1,0 +1,9 @@
+<launch>
+  <arg name="odom_topic" default="/mavros/local_position/odom" />
+  <arg name="pose_topic" default="/camera/pose"/>
+
+  <node pkg="esdf_planner" name="px4_camera_pose_publisher" type="camera_pose_publisher.py" output="screen">
+    <arg name="odom_topic" default="$(arg odom_topic)" />
+    <arg name="odom_topic" default="$(arg odom_topic)" />
+  </node>
+</launch>
