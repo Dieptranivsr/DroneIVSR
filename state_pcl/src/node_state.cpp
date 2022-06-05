@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include <check_state/DroneState.h>
+#include <state_pcl/DroneState.h>
 
 #include <Eigen/Dense>
 
@@ -46,7 +46,7 @@ void Syn::initSyn(ros::NodeHandle& nh){
     localPose = node.subscribe<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 10, &Syn::poseCallback, this);
     localVel = node.subscribe<geometry_msgs::TwistStamped>("/mavros/local_position/velocity_local", 10, &Syn::velocityLocalCallback, this);
 
-    state_pub_ = node.advertise<check_state::DroneState>("/state", 10);
+    state_pub_ = node.advertise<state_pcl::DroneState>("/state", 10);
 
     state_timer_ = node.createTimer(ros::Duration(0.05), &Syn::stateCallback, this);
 }
@@ -66,7 +66,7 @@ void Syn::velocityLocalCallback(const geometry_msgs::TwistStampedConstPtr& vel_)
 }
 
 void Syn::stateCallback(const ros::TimerEvent& /*event*/){
-    check_state::DroneState pubData;
+    state_pcl::DroneState pubData;
     
     pubData.header.frame_id = "world";
     pubData.header.stamp = ros::Time::now();

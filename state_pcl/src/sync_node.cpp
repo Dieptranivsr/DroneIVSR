@@ -16,8 +16,6 @@
 #include <message_filters/sync_policies/exact_time.h>
 #include <message_filters/time_synchronizer.h>
 
-#include <plan_env/raycast.h>
-
 using namespace std;
 
 class Syn{

@@ -1,0 +1,12 @@
+<launch>
+
+  <node pkg="state_pcl" name="show_lidar" type="show_lidar" output="screen">
+  </node>
+
+  <!-- Rviz -->
+  <arg name="file_rviz" default="show_lidar"/>
+  <include file="$(find state_pcl)/launch/rviz.launch">
+    <arg name="file_rviz" value="$(arg file_rviz)" />
+  </include>
+
+</launch>

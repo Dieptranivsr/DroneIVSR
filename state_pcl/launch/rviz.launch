@@ -1,0 +1,4 @@
+<launch>
+  <arg name="file_rviz" default="show_lidar"/>
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find state_pcl)/rviz/$(arg file_rviz).rviz" />
+</launch>

@@ -1,0 +1,15 @@
+<launch>
+
+  <!-- ROS static transformation -->
+  <!--<node pkg="tf" type="static_transform_publisher" name="world_map_linker" args="0 0 0 0 0 0 world map 100" />-->
+  <node pkg="tf" type="static_transform_publisher" name="tf_camera" args="0.1 0 0.0 -1.57 0 -1.57 base_link camera_depth_optical_frame 33"/>
+
+  <node pkg="state_pcl" name="depth_pcl" type="depth_pcl" output="screen">
+  </node>
+
+  <!-- Rviz -->
+  <arg name="file_rviz" default="show_pcl"/>
+  <include file="$(find state_pcl)/launch/rviz.launch">
+    <arg name="file_rviz" value="$(arg file_rviz)" />
+  </include>
+</launch>
