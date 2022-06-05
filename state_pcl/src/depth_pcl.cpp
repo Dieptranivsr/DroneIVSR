@@ -46,7 +46,7 @@ void DepthPcl::initDepthPcl(ros::NodeHandle& nh){
 
     depth_cb = node.subscribe<sensor_msgs::Image>("/depth", 50, &DepthPcl::depthCallback, this);
 
-    pointcloud_publisher = node.advertise<sensor_msgs::PointCloud2>("/state", 10);
+    pointcloud_publisher = node.advertise<sensor_msgs::PointCloud2>("/depthPointCloud", 10);
 
     state_timer_ = node.createTimer(ros::Duration(0.05), &DepthPcl::stateCallback, this);
 }
