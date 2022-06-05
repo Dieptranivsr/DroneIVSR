@@ -28,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: RGB Camera
+    SyncSource: color_cloud
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -104,8 +104,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 16.93956756591797
-        Min Value: -26.642349243164062
+        Max Value: -9999
+        Min Value: 9999
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -124,7 +124,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.10000000149011612
       Style: Boxes
-      Topic: /state
+      Topic: /depthPointCloud
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
