@@ -5,6 +5,7 @@
 ### Depth image to PointCloud (PointCloud2 message)
 
 ```shell
+  $ catkin build state_pcl
   $ roslaunch state_pcl show_pcl.launch
   $ rosbag play file_bag.bag
   $ rostopic echo /depthPointCloud
@@ -19,6 +20,7 @@
 ### Lidar(has intensity data) Message Information
 
 ```shell
+  $ catkin build state_pcl
   $ roslaunch state_pcl show_lidar.launch
   $ rosbag play file_bag.bag
   $ rostopic echo /lidar_intensity
