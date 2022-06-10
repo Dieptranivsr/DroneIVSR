@@ -7,20 +7,21 @@
 #include <pcl/conversions.h>
 
 #include <iostream>
-#include <Eigen/Dense>
 
 using namespace std;
 
-class Syn{
+class LidarPcl{
 public:
-    Syn() {}
-    ~Syn() {}
+    LidarPcl() {}
+    ~LidarPcl() {}
 
-    void initSyn(ros::NodeHandle& nh);
+    void initLidarPcl(ros::NodeHandle& nh);
 
+    // Refers to the conversion of pointers and non-pointers in pcl. 
+    // Among them, new pcl::PointCloud<pcl::PointXYZ> is the data format of the original point cloud.
     typedef pcl::PointCloud<pcl::PointXYZI> PointCloud;
 
-    typedef std::shared_ptr<Syn> Ptr;
+    typedef std::shared_ptr<LidarPcl> Ptr;
 private:
     void lidarCallback(const sensor_msgs::PointCloud2ConstPtr& lidar_msg);
 
@@ -30,21 +31,25 @@ private:
     ros::Publisher pointcloud_publisher;
 };
 
-void Syn::initSyn(ros::NodeHandle& nh){
+void LidarPcl::initLidarPcl(ros::NodeHandle& nh){
     node = nh;
 
-    lidar_cb = node.subscribe<sensor_msgs::PointCloud2>("/airsim_node/PX4/lidar/Lidar", 10, &Syn::lidarCallback, this);
+    lidar_cb = node.subscribe<sensor_msgs::PointCloud2>("/airsim_node/PX4/lidar/Lidar", 10, &LidarPcl::lidarCallback, this);
 
     pointcloud_publisher = node.advertise<sensor_msgs::PointCloud2>("/lidar_intensity", 10);
 }
 
-void Syn::lidarCallback(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
+void LidarPcl::lidarCallback(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
     std::cout << "lidar: " << lidar_msg->header.stamp << std::endl;
 
+    // Declare the output point cloud format
     sensor_msgs::PointCloud2 pub_pointcloud;
 
+    // When a function returns a pointer, there will often be unknowing errors. 
+    // Instead of returning a pointer, you can get PointXYZ directly, and then convert it to Ptr
     PointCloud::Ptr cloud_int (new PointCloud); 
 
+    // Get the field structure of this point cloud
     int pointBytes = lidar_msg->point_step;
     int offset_x;
     int offset_y;
@@ -63,6 +68,7 @@ void Syn::lidarCallback(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
             offset_int = lidar_msg->fields[f].offset;
     }
 
+    // populate point cloud object
     for ( int p=0; p<lidar_msg->width; ++p)
     {
         pcl::PointXYZI newPoint;
@@ -74,11 +80,15 @@ void Syn::lidarCallback(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
         cloud_int->points.push_back(newPoint);
     }
 
-    cloud_int->height = 1;
-    cloud_int->width = cloud_int->points.size();
+    cloud_int->height   = 1;
+    cloud_int->width    = cloud_int->points.size();
     cloud_int->is_dense = lidar_msg->is_dense;
 
+    // Convert the pcl point cloud format to the point cloud format under ros, 
+    // pcl::PointCloud<pcl::PointXYZI> to sensor_msgs::PointCloud2
     pcl::toROSMsg(*cloud_int, pub_pointcloud);
+
+    // Assign the index of lidar_msg to pub_pointcloud.header here
     pub_pointcloud.header = lidar_msg->header;
     pointcloud_publisher.publish(pub_pointcloud);
 
@@ -87,14 +97,14 @@ void Syn::lidarCallback(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "node_state");
+    ros::init(argc, argv, "lidar_pointcloud");
     ros::NodeHandle node("~");
     
-    std::cout << "Starting show full lidar message <pcl::PointCloud<pcl::PointXYZI>> ...." << std::endl;
-    Syn::Ptr syn_lidar;
+    std::cout << "Starting to show full lidar message <pcl::PointCloud<pcl::PointXYZI>> ...." << std::endl;
+    LidarPcl::Ptr syn_lidar;
 
-    syn_lidar.reset(new Syn);
-    syn_lidar->initSyn(node);
+    syn_lidar.reset(new LidarPcl);
+    syn_lidar->initLidarPcl(node);
 
     ros::Duration(1.0).sleep();
     ros::spin();

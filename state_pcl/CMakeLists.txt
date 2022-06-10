@@ -7,10 +7,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.8 REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.2.0 REQUIRED)       # if you install the latest version of OpenCV LIBRARIES
 
 set(PCL_INCLUDE_DIRS /usr/include/pcl-1.8)
 add_definitions(${PCL_DEFINITIONS})
+
+# turn off WARNINGS Notification
+# see here: https://github.com/PointCloudLibrary/pcl/issues/3680
+# when this is fixed, we can remove the following 3 lines.
+if(NOT DEFINED CMAKE_SUPPRESS_DEVELOPER_WARNINGS)
+     set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "No dev warnings")
+endif()
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -61,11 +68,7 @@ add_executable(node_state
   src/node_state.cpp
   )
 
-#add_executable(check_lidar           #ignore
-#  src/node_lidar.cpp
-#  )
-
-add_executable(show_lidar
+add_executable(show_lidar             # node show_lidar
   src/show_lidar.cpp
   )
 
@@ -77,12 +80,7 @@ target_link_libraries(node_state
   ${catkin_LIBRARIES}
   )
 
-#target_link_libraries(check_lidar    #ignore
-#  ${catkin_LIBRARIES}
-#  ${PCL_LIBRARIES}
-#  )
-
-target_link_libraries(show_lidar
+target_link_libraries(show_lidar      # node show_lidar
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
   )

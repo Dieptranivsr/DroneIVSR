@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Axes1
         - /color_cloud1
       Splitter Ratio: 0.5
     Tree Height: 528
@@ -76,8 +75,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 3.258018970489502
+        Min Value: -20.967618942260742
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -96,7 +95,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.10000000149011612
       Style: Boxes
-      Topic: /state
+      Topic: /depth/points
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -104,8 +103,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: -9999
-        Min Value: 9999
+        Max Value: 9.676454544067383
+        Min Value: -16.117067337036133
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -123,8 +122,8 @@ Visualization Manager:
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.10000000149011612
-      Style: Boxes
-      Topic: /depthPointCloud
+      Style: Points
+      Topic: /depth/points
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -163,18 +162,18 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -8.224732398986816
-        Y: 1.2905464172363281
-        Z: -4.76837158203125e-7
+        X: -9.55369758605957
+        Y: -0.5291116237640381
+        Z: -4.824844381801086e-7
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.17520380020141602
+      Pitch: 0.11020348221063614
       Target Frame: <Fixed Frame>
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.1235835552215576
+      Yaw: 3.153582811355591
     Saved:
       - Class: rviz/ThirdPersonFollower
         Distance: 17.48538589477539
