@@ -30,6 +30,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   image_geometry
   image_transport
+
+  quadrotor_msgs
 )
 
 # Generate messages in the 'msg' folder
@@ -64,30 +66,38 @@ include_directories(
 
 link_directories(${PCL_LIBRARY_DIRS})
 
-add_executable(node_state
-  src/node_state.cpp
+#add_executable(node_state
+#  src/node_state.cpp
+#  )
+
+#add_executable(show_lidar             # node show_lidar
+#  src/show_lidar.cpp
+#  )
+
+#add_executable(depth_pcl
+#  src/depth_pcl.cpp
+#  )
+
+add_executable(visual_traj
+  src/visual_trajectory.cpp
   )
 
-add_executable(show_lidar             # node show_lidar
-  src/show_lidar.cpp
-  )
+#target_link_libraries(node_state
+#  ${catkin_LIBRARIES}
+#  )
 
-add_executable(depth_pcl
-  src/depth_pcl.cpp
-  )
+#target_link_libraries(show_lidar      # node show_lidar
+#  ${catkin_LIBRARIES}
+#  ${PCL_LIBRARIES}
+#  )
 
-target_link_libraries(node_state
+#target_link_libraries(depth_pcl
+#  ${catkin_LIBRARIES}
+#  ${PCL_LIBRARIES}
+#  )
+
+target_link_libraries(visual_traj
   ${catkin_LIBRARIES}
-  )
-
-target_link_libraries(show_lidar      # node show_lidar
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
-  )
-
-target_link_libraries(depth_pcl
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
   )
 
 #catkin_install_python(PROGRAMS scripts/getDepth.py
