@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="rpi_jetson" name="jetson_side" type="jetson_side" output="screen">
+  </node>
+</launch>
