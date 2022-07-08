@@ -82,6 +82,10 @@ add_executable(visual_traj
   src/visual_trajectory.cpp
   )
 
+add_executable(visual_pose
+  src/local_pose.cpp
+  )
+
 #target_link_libraries(node_state
 #  ${catkin_LIBRARIES}
 #  )
@@ -100,6 +104,9 @@ target_link_libraries(visual_traj
   ${catkin_LIBRARIES}
   )
 
+target_link_libraries(visual_pose
+  ${catkin_LIBRARIES}
+  )
 #catkin_install_python(PROGRAMS scripts/getDepth.py
 #  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 #)
